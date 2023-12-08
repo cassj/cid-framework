@@ -754,7 +754,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: DeployTAModule
     Properties:
-      TemplateURL: !Sub "https://raw.githubusercontent.com/cassj/cid-framework/deploy/data-collection/deploy/module-trusted-advisor.yaml"
+      TemplateURL: !Sub "https://github.com/cassj/cid-framework/tree/deploy/data-collection/deploy/module-trusted-advisor.yaml"
       Parameters:
         DestinationBucket: !Ref S3Bucket
         DestinationBucketARN: !GetAtt S3Bucket.Arn
@@ -771,7 +771,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: DeployRightsizingModule
     Properties:
-      TemplateURL: !Sub "https://raw.githubusercontent.com/cassj/cid-framework/deploy/data-collection/deploy/module-cost-explorer-rightsizing.yaml"
+      TemplateURL: !Sub "https://github.com/cassj/cid-framework/tree/deploy/data-collection/deploy/module-cost-explorer-rightsizing.yaml"
       Parameters:
         DestinationBucket: !Ref S3Bucket
         DestinationBucketARN: !GetAtt S3Bucket.Arn
@@ -788,7 +788,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: DeployCostOptimizationHubModule
     Properties:
-      TemplateURL: !Sub "https://raw.githubusercontent.com/cassj/cid-framework/deploy/data-collection/deploy/module-cost-optimization-hub.yaml"
+      TemplateURL: !Sub "https://github.com/cassj/cid-framework/tree/deploy/data-collection/deploy/module-cost-optimization-hub.yaml"
       Parameters:
         DestinationBucket: !Ref S3Bucket
         DestinationBucketARN: !GetAtt S3Bucket.Arn
@@ -805,7 +805,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: DeployCostAnomalyModule
     Properties:
-      TemplateURL: !Sub "https://raw.githubusercontent.com/cassj/cid-framework/deploy/data-collection/deploy/module-cost-anomaly.yaml"
+      TemplateURL: !Sub "https://github.com/cassj/cid-framework/tree/deploy/data-collection/deploy/module-cost-anomaly.yaml"
       Parameters:
         DestinationBucket: !Ref S3Bucket
         DestinationBucketARN: !GetAtt S3Bucket.Arn
@@ -822,7 +822,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: DeployBackupModule
     Properties:
-      TemplateURL: !Sub "https://raw.githubusercontent.com/cassj/cid-framework/deploy/data-collection/deploy/module-backup.yaml"
+      TemplateURL: !Sub "https://github.com/cassj/cid-framework/tree/deploy/data-collection/deploy/module-backup.yaml"
       Parameters:
         DestinationBucket: !Ref S3Bucket
         DestinationBucketARN: !GetAtt S3Bucket.Arn
@@ -839,7 +839,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: DeployInventoryCollectorModule
     Properties:
-      TemplateURL: !Sub "https://raw.githubusercontent.com/cassj/cid-framework/deploy/data-collection/deploy/module-inventory.yaml"
+      TemplateURL: !Sub "https://github.com/cassj/cid-framework/tree/deploy/data-collection/deploy/module-inventory.yaml"
       Parameters:
         DestinationBucket: !Ref S3Bucket
         DestinationBucketARN: !GetAtt S3Bucket.Arn
@@ -861,7 +861,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: DeployPricingModule
     Properties:
-      TemplateURL: !Sub "https://raw.githubusercontent.com/cassj/cid-framework/deploy/data-collection/deploy/module-pricing.yaml"
+      TemplateURL: !Sub "https://github.com/cassj/cid-framework/tree/deploy/data-collection/deploy/module-pricing.yaml"
       Parameters:
         DestinationBucket: !Ref S3Bucket
         DestinationBucketARN: !GetAtt S3Bucket.Arn
@@ -881,7 +881,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: DeployComputeOptimizerModule
     Properties:
-      TemplateURL: !Sub "https://raw.githubusercontent.com/cassj/cid-framework/deploy/data-collection/deploy/module-compute-optimizer.yaml"
+      TemplateURL: !Sub "https://github.com/cassj/cid-framework/tree/deploy/data-collection/deploy/module-compute-optimizer.yaml"
       Parameters:
         DestinationBucket: !Ref S3Bucket
         ManagementRoleName: !Sub "${ResourcePrefix}${ManagementAccountRole}"
@@ -904,7 +904,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: DeployEcsChargebackModule
     Properties:
-      TemplateURL: !Sub "https://raw.githubusercontent.com/cassj/cid-framework/deploy/data-collection/deploy/module-ecs-chargeback.yaml"
+      TemplateURL: !Sub "https://github.com/cassj/cid-framework/tree/deploy/data-collection/deploy/module-ecs-chargeback.yaml"
       Parameters:
         DestinationBucket: !Ref S3Bucket
         DestinationBucketARN: !GetAtt S3Bucket.Arn
@@ -926,7 +926,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: DeployRDSUtilizationModule
     Properties:
-      TemplateURL: !Sub "https://raw.githubusercontent.com/cassj/cid-framework/deploy/data-collection/deploy/module-rds-usage.yaml"
+      TemplateURL: !Sub "https://github.com/cassj/cid-framework/tree/deploy/data-collection/deploy/module-rds-usage.yaml"
       Parameters:
         DestinationBucket: !Ref S3Bucket
         DestinationBucketARN: !GetAtt S3Bucket.Arn
@@ -948,7 +948,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: DeployOrgDataModule
     Properties:
-      TemplateURL: !Sub "https://raw.githubusercontent.com/cassj/cid-framework/deploy/data-collection/deploy/module-organization.yaml"
+      TemplateURL: !Sub "https://github.com/cassj/cid-framework/tree/deploy/data-collection/deploy/module-organization.yaml"
       Parameters:
         DestinationBucket: !Ref S3Bucket
         DestinationBucketARN: !GetAtt S3Bucket.Arn
@@ -966,7 +966,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: DeployBudgetsModule
     Properties:
-      TemplateURL: !Sub "https://raw.githubusercontent.com/cassj/cid-framework/deploy/data-collection/deploy/module-budgets.yaml" 
+      TemplateURL: !Sub "https://github.com/cassj/cid-framework/tree/deploy/data-collection/deploy/module-budgets.yaml" 
       Parameters:
         DestinationBucket: !Ref S3Bucket
         DestinationBucketARN: !GetAtt S3Bucket.Arn
@@ -983,7 +983,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: DeployTransitGatewayModule
     Properties:
-      TemplateURL: !Sub "https://raw.githubusercontent.com/cassj/cid-framework/deploy/data-collection/deploy/module-transit-gateway.yaml"
+      TemplateURL: !Sub "https://github.com/cassj/cid-framework/tree/deploy/data-collection/deploy/module-transit-gateway.yaml"
       Parameters:
         DestinationBucket: !Ref S3Bucket
         DestinationBucketARN: !GetAtt S3Bucket.Arn
@@ -1005,7 +1005,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: DeployAccountCollector
     Properties:
-      TemplateURL: !Sub "https://raw.githubusercontent.com/cassj/cid-framework/deploy/data-collection/deploy/account-collector.yaml"
+      TemplateURL: !Sub "https://github.com/cassj/cid-framework/tree/deploy/data-collection/deploy/account-collector.yaml"
       Parameters:
         ManagementRoleName: !Sub "${ResourcePrefix}${ManagementAccountRole}"
         ManagementAccountID: !Ref ManagementAccountID
