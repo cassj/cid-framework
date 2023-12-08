@@ -168,7 +168,7 @@ Resources:
   DataCollectorMgmtAccountReadStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub "https://github.com/cassj/cid-framework/tree/deploy/data-collection/deploy/deploy-in-management-account.yaml"
+      TemplateURL: !Sub "deploy-in-management-account.yaml"
       Parameters:
         DataCollectionAccountID: !Ref DataCollectionAccountID
         ManagementAccountRole: !Ref ManagementAccountRole
@@ -182,7 +182,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: DeployModuleReadInMgmt
     Properties:
-      TemplateURL: !Sub "https://github.com/cassj/cid-framework/tree/deploy/data-collection/deploy/deploy-in-linked-account.yaml"
+      TemplateURL: !Sub "deploy-in-linked-account.yaml"
       Parameters:
         DataCollectionAccountID: !Ref DataCollectionAccountID
         MultiAccountRoleName: !Ref MultiAccountRoleName
@@ -235,4 +235,4 @@ Resources:
         - CAPABILITY_IAM
         - CAPABILITY_NAMED_IAM
       StackSetName: !Sub "StackSet-${AWS::AccountId}-OptimizationDataRole"
-      TemplateURL: !Sub "https://github.com/cassj/cid-framework/tree/deploy/data-collection/deploy/deploy-in-linked-account.yaml"
+      TemplateURL: !Sub "deploy-in-linked-account.yaml"
