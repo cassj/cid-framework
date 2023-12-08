@@ -33,8 +33,8 @@ cp data-collection/deploy/deploy-data-read-permissions.yaml data-collection/depl
 # and replace the source bucket info with the git repo location
 BUCKETPATH='https://${CFNTemplateSourceBucket}.s3.amazonaws.com/cfn/data-collection/'
 GITPATH="https://raw.githubusercontent.com/$USER/$REPO/$BRANCH/data-collection/deploy/"
-perl -pi -e "s|$BUCKETPATH|$GITPATH|g" data-collection/deploy/git-deploy-data-collection.yaml
-perl -pi -e "s|$BUCKETPATH|$GITPATH|g" data-collection/deploy/git-deploy-data-read-permissions.yaml
+sed -i '' "s|$BUCKETPATH|$GITPATH|g" data-collection/deploy/git-deploy-data-collection.yaml
+sed -i '' "s|$BUCKETPATH|$GITPATH|g" data-collection/deploy/git-deploy-data-read-permissions.yaml
 
 
 
