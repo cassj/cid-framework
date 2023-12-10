@@ -33,9 +33,11 @@ done
 cat << EOF > .git/hooks/pre-push
 #!/bin/sh
 
-remote="$1"
-url="$2"
-aws s3 sync data-collection/deploy s3://cid-datacollection-templates000826210026/cfn/
+# Doesn't seem like you can sync to a prefix, so fudge it so I don't have to change the yaml files
+mkdir -p upload/cfn
+ln -s ../../data-collection upload/cfn/data-collection
+aws s3 sync --exclude "*" --include "cfn/data-collection/deploy/*" upload/ s3://cid-datacollection-templates000826210026/
+rm -rf upload
 exit 0
 
 EOF
