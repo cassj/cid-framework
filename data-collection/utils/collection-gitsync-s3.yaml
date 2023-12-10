@@ -125,6 +125,7 @@ Resources:
               AWS: 
                 - !Sub "arn:aws:iam::${ManagementAccountID}:role/${ManagementAccountDeploymentRole}"
                 - !Sub "arn:aws:iam::${CollectionAccountID}:role/${CollectionAccountDeploymentRole}"
+                - !Syb "arn:aws:iam::${ManagementAccountID}:role/aws-service-role/repository.sync.codeconnections.amazonaws.com/AWSServiceRoleForGitSync"
 
 
 
