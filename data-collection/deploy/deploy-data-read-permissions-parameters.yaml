@@ -3,7 +3,7 @@ parameters:
   DataCollectionAccountID: '000826210026'
   CFNTemplateSourceBucket: cid-datacollection-templates000826210026
   AllowModuleReadInMgmt: 'yes'
-  OrganizationalUnitID: r-e8qn
+  OrganizationalUnitIds: r-e8qn
   IncludeBudgetsModule: 'no'
   IncludeComputeOptimizerModule: 'no'
   IncludeCostAnomalyModule: 'no'
