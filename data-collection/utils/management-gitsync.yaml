@@ -1,0 +1,59 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CID Data Collection git-sync bucket for nested templates
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: 'Deployment parameters'
+        Parameters:
+          - ManagementAccountDeploymentRole
+    ParameterLabels:
+      ManagementAccountDeploymentRole:
+        default: 'git-sync deployment role used in the management account'
+
+Parameters:
+  ManagementAccountDeploymentRole:
+    Type: String
+    Description: The name of the IAM role in the management account for git-sync deployments (not deployed in this stack)
+    Default: CIDGithubDeploymentRole
+
+Resources:
+  GithubDeploymentRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${ManagementAccountDeploymentRole}"
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - cloudformation.amazonaws.com
+                - cloudformation.sync.codeconnections.amazonaws.com 
+        Version: 2012-10-17
+      Path: /
+      Policies:
+        - PolicyName: DeployPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: "*"
+                Resource: "*"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
