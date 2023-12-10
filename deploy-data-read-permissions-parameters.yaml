@@ -1,0 +1,3 @@
+template-file-path: data-collection/deploy/deploy-data-read-permissions.yaml
+parameters: {}
+tags: {}
