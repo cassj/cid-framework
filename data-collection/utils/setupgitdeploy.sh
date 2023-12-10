@@ -34,7 +34,7 @@ cat << EOF > .git/hooks/pre-push
 #!/bin/sh
 remote="$1"
 url="$2"
-aws s3 sync ../../data-collection/deploy s3://cid-datacollection-templates000826210026/
+aws s3 sync data-collection/deploy s3://cid-datacollection-templates000826210026/
 exit 0
 
 EOF
