@@ -32,7 +32,6 @@ done
 # set up the pre-push hook to sync the template bucket before every git push
 cat << EOF > .git/hooks/pre-push
 #!/bin/sh
-
 # Doesn't seem like you can sync to a prefix, so fudge it so I don't have to change the yaml cfn files
 mkdir -p upload/cfn
 ln -s ../../data-collection upload/cfn/data-collection
