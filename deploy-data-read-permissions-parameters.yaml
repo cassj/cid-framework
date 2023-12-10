@@ -1,3 +1,17 @@
 template-file-path: data-collection/deploy/deploy-data-read-permissions.yaml
-parameters: {}
+parameters: {
+  "DataCollectionAccountID": "000826210026",
+  "AllowModuleReadInMgmt": "yes",
+  "OrganizationalUnitID: "r-e8qn",
+  "IncludeBudgetsModule: "no",
+  "IncludeComputeOptimizerModule: "no",
+  "IncludeCostAnomalyModule: "no",
+  "IncludeECSChargebackModule: "no",
+  "IncludeInventoryCollectorModule: "yes",
+  "IncludeRDSUtilizationModule: "no",
+  "IncludeRightsizingModule: "no",
+  "IncludeTAModule": "no",
+  "IncludeTransitGatewayModule" : "no"
+
+}
 tags: {}
