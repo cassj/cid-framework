@@ -33,7 +33,7 @@ done
 cat << EOF > .git/hooks/pre-push
 #!/bin/sh
 
-# Doesn't seem like you can sync to a prefix, so fudge it so I don't have to change the yaml files
+# Doesn't seem like you can sync to a prefix, so fudge it so I don't have to change the yaml cfn files
 mkdir -p upload/cfn
 ln -s ../../data-collection upload/cfn/data-collection
 aws s3 sync --exclude "*" --include "cfn/data-collection/deploy/*" upload/ s3://cid-datacollection-templates000826210026/
