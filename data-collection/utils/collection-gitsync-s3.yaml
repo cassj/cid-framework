@@ -1,0 +1,138 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CID Data Collection git-sync bucket for nested templates
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: 'Deployment parameters'
+        Parameters:
+          - NestedTemplateBucket
+          - ManagementAccountDeploymentRole
+          - ManagementAccountID
+          - CollectionAccountDeploymentRole
+          - CollectionAccountID
+    ParameterLabels:
+      NestedTemplateBucket:
+        default: 'S3 bucket for nested templates'
+      ManagementAccountDeploymentRole:
+        default: 'git-sync deployment role used in the management account'
+      ManagementAccountID:
+        default: 'Comma Delimited list of Account IDs for all Management Account IDs'
+      CollectionAccountDeploymentRole:
+        default: 'git-sync deployment role used in the Collection account'
+      CollectionAccountID:
+        default: 'Collection account ID'
+
+Parameters:
+  NestedTemplateBucket:
+    Type: String
+    Description: Name of the S3 Bucket that needs to be created to store nested templates (until git-sync supports this natively)
+    AllowedPattern: (?=^.{3,36}$)(?!^(\d+\.)+\d+$)(^(([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])\.)*([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9\-])$)
+    Default: cid-datacollection-templates
+  ManagementAccountDeploymentRole:
+    Type: String
+    Description: The name of the IAM role in the management account for git-sync deployments (not deployed in this stack)
+    Default: CIDGithubDeploymentRole
+  ManagementAccountID:
+    Type: String
+    AllowedPattern: ([a-z0-9\-, ]*?$)
+    Description: "(Ex: 123456789,098654321,789054312) List of Payer IDs you wish to collect data for. Can just be one Accounts"
+  CollectionAccountDeploymentRole:
+    Type: String
+    Description: The name of the IAM role in the collection account for git-sync deployments (not deployed as part of this stack)
+    Default: CIDGithubDeploymentRole
+  CollectionAccountID:
+    Type: String
+    AllowedPattern: ([a-z0-9\-, ]*?$)
+    Description: "ID of the account in which your data collection stack will be deployed"
+
+Outputs:
+  S3Bucket:
+    Description: Name of S3 Bucket which will hold nested templates for git-sync
+    Value: !Ref S3Bucket
+  S3BucketARN:
+    Description: ARN of S3 Bucket which will hold nested templates for git-sync
+    Value: !GetAtt S3Bucket.Arn
+
+Resources:
+  GithubDeploymentRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${CollectionAccountDeploymentRole}"
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - cloudformation.amazonaws.com
+                - cloudformation.sync.codeconnections.amazonaws.com 
+        Version: 2012-10-17
+      Path: /
+      Policies:
+        - PolicyName: DeployPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: "*"
+                Resource: "*"
+
+  S3Bucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Sub "${NestedTemplateBucket}${AWS::AccountId}"
+      VersioningConfiguration:
+        Status: Suspended
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+            BlockPublicAcls : true
+            BlockPublicPolicy : true
+            IgnorePublicAcls : true
+            RestrictPublicBuckets : true
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W35 #S3 Bucket should have access logging configured
+            reason: "This bucket is only used for temp storage of publicly available template code."
+
+  S3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowSSLRequestsOnly
+            Action: s3:*
+            Effect: Deny
+            Resource: !Join ["", [!GetAtt S3Bucket.Arn, "/*"]]
+            Condition:
+              Bool:
+                aws:SecureTransport: "false"
+            Principal: "*"
+          - Sid: AllowDeployMgmtReadWrite
+            Action: s3:*
+            Effect: Allow
+            Resource: !Join ["", [!GetAtt S3Bucket.Arn, "/*"]]
+            Principal: 
+              AWS: 
+                - !Sub "arn:aws:iam::${ManagementAccountID}:role/${ManagementAccountDeploymentRole}"
+                - !Sub "arn:aws:iam::${CollectionAccountID}:role/${CollectionAccountDeploymentRole}"
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -3,7 +3,7 @@
 usage() { echo "$0 usage:" && grep " .)\ #" $0; exit 0; }
 [ $# -eq 0 ] && usage
 
-while getopts "hu:b:r:" arg; do
+while getopts "hu:b:r:s:" arg; do
   case $arg in
     u) # Specify Github Username
       USER=${OPTARG}
@@ -14,6 +14,9 @@ while getopts "hu:b:r:" arg; do
     b) # Specify Github Branch (deploy)
       BRANCH=${OPTARG}
       ;;
+    s) # Specify S3 bucket for nested templates
+      BUCKET=${OPTARG}
+      ;;
     h | *) # Display help.
       usage
       exit 0
@@ -22,22 +25,19 @@ while getopts "hu:b:r:" arg; do
 done
 
 [[ -z $USER ]] && usage
+[[ -z $BUCKET ]] && usage
 [[ -z $BRANCH ]] && BRANCH="deploy"
 [[ -z $REPO ]] && REPO="cid-framework"
 
+# set up the pre-push hook to sync the template bucket before every git push
+cat << EOF > .git/hooks/pre-push
+#!/bin/sh
+remote="$1"
+url="$2"
+aws s3 sync ../../data-collection/deploy s3://cid-datacollection-templates000826210026/
+exit 0
 
-# create git versions of the top level stack definitions
-cp data-collection/deploy/deploy-data-collection.yaml data-collection/deploy/git-deploy-data-collection.yaml
-cp data-collection/deploy/deploy-data-read-permissions.yaml data-collection/deploy/git-deploy-data-read-permissions.yaml
-
-# and replace the source bucket info with the git repo location
-BUCKETPATH='https://${CFNTemplateSourceBucket}.s3.amazonaws.com/cfn/data-collection/'
-#GITPATH="https://raw.githubusercontent.com/$USER/$REPO/$BRANCH/data-collection/deploy/"
-#GITPATH="https://github.com/$USER/$REPO/tree/$BRANCH/data-collection/deploy/"
-
-sed -i '' "s|$BUCKETPATH||g" data-collection/deploy/git-deploy-data-collection.yaml
-sed -i '' "s|$BUCKETPATH||g" data-collection/deploy/git-deploy-data-read-permissions.yaml
-
+EOF
 
 
 
