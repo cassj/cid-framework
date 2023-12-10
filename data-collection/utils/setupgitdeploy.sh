@@ -32,6 +32,7 @@ done
 # set up the pre-push hook to sync the template bucket before every git push
 cat << EOF > .git/hooks/pre-push
 #!/bin/sh
+
 remote="$1"
 url="$2"
 aws s3 sync data-collection/deploy s3://cid-datacollection-templates000826210026/cfn/
