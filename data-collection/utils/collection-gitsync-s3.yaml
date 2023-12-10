@@ -118,7 +118,9 @@ Resources:
           - Sid: AllowDeployMgmtReadWrite
             Action: s3:*
             Effect: Allow
-            Resource: !Join ["", [!GetAtt S3Bucket.Arn, "/*"]]
+            Resource:
+              - !GetAtt S3Bucket.Arn 
+              - !Join ["", [!GetAtt S3Bucket.Arn, "/*"]]
             Principal: 
               AWS: 
                 - !Sub "arn:aws:iam::${ManagementAccountID}:role/${ManagementAccountDeploymentRole}"
