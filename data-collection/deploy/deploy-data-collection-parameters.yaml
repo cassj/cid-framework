@@ -12,4 +12,6 @@ parameters:
   IncludeOrgDataModule: 'yes'
   IncludeBudgetsModule: 'no'
   IncludeTransitGatewayModule: 'no'
+  IncludeBackupModule: 'no'
+  IncludeCostOptimizationHubModule: 'no'
 tags: {}
