@@ -10,7 +10,7 @@ parameters:
   IncludeECSChargebackModule: ' no'
   IncludeRDSUtilizationModule: 'yes'
   IncludeOrgDataModule: 'yes'
-  IncludeBudgetsModule: 'no'
+  IncludeBudgetsModule: 'yes'
   IncludeTransitGatewayModule: 'no'
   IncludeBackupModule: 'no'
   IncludeCostOptimizationHubModule: 'no'
