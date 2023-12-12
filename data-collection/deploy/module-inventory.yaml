@@ -179,6 +179,7 @@ Resources:
               except Exception as exc:  #pylint: disable=broad-exception-caught
                   logger.info(f'Error in scan {function_name}/{account_id}: {exc}')
 
+
           def opensearch_domains_scan(account_id, region):
               """ special treatment for opensearch_scan """
               service = 'opensearch'
