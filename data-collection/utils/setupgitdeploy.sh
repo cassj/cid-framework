@@ -35,7 +35,7 @@ cat << EOF > .git/hooks/pre-push
 # Doesn't seem like you can sync to a prefix, so fudge it so I don't have to change the yaml cfn files
 mkdir -p upload/cfn/
 ln -s ../../data-collection/deploy/ upload/cfn/data-collection
-aws s3 sync upload/ s3://cid-datacollection-templates000826210026/
+aws s3 sync upload/ s3://${BUCKET}/
 rm -rf upload
 exit 0
 

@@ -5,7 +5,7 @@ parameters:
   IncludeTAModule: 'yes'
   IncludeRightsizingModule: 'yes'
   IncludeCostAnomalyModule: 'yes'
-  IncludeInventoryCollectorModule: 'yes'
+  IncludeInventoryCollectorModule: 'no'
   IncludeComputeOptimizerModule: 'yes'
   IncludeECSChargebackModule: ' yes'
   IncludeRDSUtilizationModule: 'yes'
