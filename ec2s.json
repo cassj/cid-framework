@@ -1,0 +1,550 @@
+{
+    "Reservations": [
+        {
+            "Groups": [],
+            "Instances": [
+                {
+                    "AmiLaunchIndex": 0,
+                    "ImageId": "ami-07f6fe426f60665c5",
+                    "InstanceId": "i-090706c657f437f3d",
+                    "InstanceType": "t2.micro",
+                    "KeyName": "parallelcluster",
+                    "LaunchTime": "2021-08-24T01:44:23+00:00",
+                    "Monitoring": {
+                        "State": "disabled"
+                    },
+                    "Placement": {
+                        "AvailabilityZone": "ap-southeast-2a",
+                        "GroupName": "",
+                        "Tenancy": "default"
+                    },
+                    "PrivateDnsName": "ip-10-0-0-135.ap-southeast-2.compute.internal",
+                    "PrivateIpAddress": "10.0.0.135",
+                    "ProductCodes": [],
+                    "PublicDnsName": "",
+                    "State": {
+                        "Code": 80,
+                        "Name": "stopped"
+                    },
+                    "StateTransitionReason": "User initiated (2022-05-24 01:39:45 GMT)",
+                    "SubnetId": "subnet-08fb86edd308ca896",
+                    "VpcId": "vpc-03a82b4bd791b0ea7",
+                    "Architecture": "x86_64",
+                    "BlockDeviceMappings": [
+                        {
+                            "DeviceName": "/dev/xvda",
+                            "Ebs": {
+                                "AttachTime": "2021-08-24T01:44:24+00:00",
+                                "DeleteOnTermination": true,
+                                "Status": "attached",
+                                "VolumeId": "vol-01d5ba2764f3efe5e"
+                            }
+                        },
+                        {
+                            "DeviceName": "/dev/sdb",
+                            "Ebs": {
+                                "AttachTime": "2021-08-24T01:49:03+00:00",
+                                "DeleteOnTermination": false,
+                                "Status": "attached",
+                                "VolumeId": "vol-0ded70c1d8bb8f582"
+                            }
+                        }
+                    ],
+                    "ClientToken": "paral-Maste-1OMLZSK5E1AN2",
+                    "EbsOptimized": false,
+                    "EnaSupport": true,
+                    "Hypervisor": "xen",
+                    "IamInstanceProfile": {
+                        "Arn": "arn:aws:iam::290750254311:instance-profile/parallelcluster-my-cluster-RootInstanceProfile-1JQI9MD7U413B",
+                        "Id": "AIPAUHMQQZTT74OPL22NK"
+                    },
+                    "NetworkInterfaces": [
+                        {
+                            "Attachment": {
+                                "AttachTime": "2021-08-24T01:44:23+00:00",
+                                "AttachmentId": "eni-attach-03d52e249c3ae3bdc",
+                                "DeleteOnTermination": false,
+                                "DeviceIndex": 0,
+                                "Status": "attached",
+                                "NetworkCardIndex": 0
+                            },
+                            "Description": "AWS ParallelCluster head node interface",
+                            "Groups": [
+                                {
+                                    "GroupName": "parallelcluster-my-cluster-MasterSecurityGroup-18B2LJDJC8YGP",
+                                    "GroupId": "sg-0e7ec2dd6a303195c"
+                                }
+                            ],
+                            "Ipv6Addresses": [],
+                            "MacAddress": "02:2b:40:62:0a:d8",
+                            "NetworkInterfaceId": "eni-04d686100cfeaae5b",
+                            "OwnerId": "290750254311",
+                            "PrivateDnsName": "ip-10-0-0-135.ap-southeast-2.compute.internal",
+                            "PrivateIpAddress": "10.0.0.135",
+                            "PrivateIpAddresses": [
+                                {
+                                    "Primary": true,
+                                    "PrivateDnsName": "ip-10-0-0-135.ap-southeast-2.compute.internal",
+                                    "PrivateIpAddress": "10.0.0.135"
+                                }
+                            ],
+                            "SourceDestCheck": false,
+                            "Status": "in-use",
+                            "SubnetId": "subnet-08fb86edd308ca896",
+                            "VpcId": "vpc-03a82b4bd791b0ea7",
+                            "InterfaceType": "interface"
+                        }
+                    ],
+                    "RootDeviceName": "/dev/xvda",
+                    "RootDeviceType": "ebs",
+                    "SecurityGroups": [
+                        {
+                            "GroupName": "parallelcluster-my-cluster-MasterSecurityGroup-18B2LJDJC8YGP",
+                            "GroupId": "sg-0e7ec2dd6a303195c"
+                        }
+                    ],
+                    "SourceDestCheck": false,
+                    "StateReason": {
+                        "Code": "Client.UserInitiatedShutdown",
+                        "Message": "Client.UserInitiatedShutdown: User initiated shutdown"
+                    },
+                    "Tags": [
+                        {
+                            "Key": "ClusterName",
+                            "Value": "my-cluster"
+                        },
+                        {
+                            "Key": "Name",
+                            "Value": "Master"
+                        },
+                        {
+                            "Key": "aws-parallelcluster-node-type",
+                            "Value": "Master"
+                        },
+                        {
+                            "Key": "aws-parallelcluster-networking",
+                            "Value": "EFA=NONE"
+                        },
+                        {
+                            "Key": "aws:ec2launchtemplate:version",
+                            "Value": "1"
+                        },
+                        {
+                            "Key": "aws-parallelcluster-filesystem",
+                            "Value": "efs=0, multiebs=1, raid=0, fsx=0"
+                        },
+                        {
+                            "Key": "aws:cloudformation:stack-id",
+                            "Value": "arn:aws:cloudformation:ap-southeast-2:290750254311:stack/parallelcluster-my-cluster-MasterServerSubstack-19D83SPTN61JA/c4f466d0-047c-11ec-a2c3-0a066d6e213a"
+                        },
+                        {
+                            "Key": "Application",
+                            "Value": "parallelcluster-my-cluster"
+                        },
+                        {
+                            "Key": "aws:ec2launchtemplate:id",
+                            "Value": "lt-095dbf973a7a307e7"
+                        },
+                        {
+                            "Key": "Version",
+                            "Value": "2.11.1"
+                        },
+                        {
+                            "Key": "awssupport:patchwork",
+                            "Value": "patch"
+                        },
+                        {
+                            "Key": "aws-parallelcluster-attributes",
+                            "Value": "alinux2, slurm, 2.11.1, x86_64"
+                        },
+                        {
+                            "Key": "aws:cloudformation:logical-id",
+                            "Value": "MasterServer"
+                        },
+                        {
+                            "Key": "aws:cloudformation:stack-name",
+                            "Value": "parallelcluster-my-cluster-MasterServerSubstack-19D83SPTN61JA"
+                        }
+                    ],
+                    "VirtualizationType": "hvm",
+                    "CpuOptions": {
+                        "CoreCount": 1,
+                        "ThreadsPerCore": 1
+                    },
+                    "CapacityReservationSpecification": {
+                        "CapacityReservationPreference": "open"
+                    },
+                    "HibernationOptions": {
+                        "Configured": false
+                    },
+                    "MetadataOptions": {
+                        "State": "applied",
+                        "HttpTokens": "optional",
+                        "HttpPutResponseHopLimit": 1,
+                        "HttpEndpoint": "enabled",
+                        "HttpProtocolIpv6": "disabled",
+                        "InstanceMetadataTags": "disabled"
+                    },
+                    "EnclaveOptions": {
+                        "Enabled": false
+                    },
+                    "PlatformDetails": "Linux/UNIX",
+                    "UsageOperation": "RunInstances",
+                    "UsageOperationUpdateTime": "2021-08-24T01:44:23+00:00",
+                    "PrivateDnsNameOptions": {
+                        "HostnameType": "ip-name",
+                        "EnableResourceNameDnsARecord": false,
+                        "EnableResourceNameDnsAAAARecord": false
+                    },
+                    "MaintenanceOptions": {
+                        "AutoRecovery": "default"
+                    }
+                }
+            ],
+            "OwnerId": "290750254311",
+            "RequesterId": "035779205405",
+            "ReservationId": "r-05aec6b603ed31a43"
+        },
+        {
+            "Groups": [],
+            "Instances": [
+                {
+                    "AmiLaunchIndex": 0,
+                    "ImageId": "ami-0361bbf2b99f46c1d",
+                    "InstanceId": "i-09b9524ce98e24e6c",
+                    "InstanceType": "t2.micro",
+                    "LaunchTime": "2023-12-07T02:59:38+00:00",
+                    "Monitoring": {
+                        "State": "disabled"
+                    },
+                    "Placement": {
+                        "AvailabilityZone": "ap-southeast-2a",
+                        "GroupName": "",
+                        "Tenancy": "default"
+                    },
+                    "PrivateDnsName": "ip-10-0-30-92.ap-southeast-2.compute.internal",
+                    "PrivateIpAddress": "10.0.30.92",
+                    "ProductCodes": [],
+                    "PublicDnsName": "",
+                    "State": {
+                        "Code": 80,
+                        "Name": "stopped"
+                    },
+                    "StateTransitionReason": "User initiated (2023-12-07 13:52:21 GMT)",
+                    "SubnetId": "subnet-0cf12873f2932f86b",
+                    "VpcId": "vpc-03a82b4bd791b0ea7",
+                    "Architecture": "x86_64",
+                    "BlockDeviceMappings": [
+                        {
+                            "DeviceName": "/dev/xvda",
+                            "Ebs": {
+                                "AttachTime": "2023-12-07T02:59:39+00:00",
+                                "DeleteOnTermination": true,
+                                "Status": "attached",
+                                "VolumeId": "vol-044a845ed7ba69359"
+                            }
+                        }
+                    ],
+                    "ClientToken": "d797a5ee-2b32-4d9d-a2d8-3f39ee761732",
+                    "EbsOptimized": false,
+                    "EnaSupport": true,
+                    "Hypervisor": "xen",
+                    "IamInstanceProfile": {
+                        "Arn": "arn:aws:iam::290750254311:instance-profile/AWSSupportPatchwork-SSMRoleForInstances",
+                        "Id": "AIPAUHMQQZTTVFBKMRU2Z"
+                    },
+                    "NetworkInterfaces": [
+                        {
+                            "Attachment": {
+                                "AttachTime": "2023-12-07T02:59:38+00:00",
+                                "AttachmentId": "eni-attach-009e696619bfa6c06",
+                                "DeleteOnTermination": true,
+                                "DeviceIndex": 0,
+                                "Status": "attached",
+                                "NetworkCardIndex": 0
+                            },
+                            "Description": "",
+                            "Groups": [
+                                {
+                                    "GroupName": "launch-wizard-8",
+                                    "GroupId": "sg-0860bcbd8d9d2fd03"
+                                }
+                            ],
+                            "Ipv6Addresses": [],
+                            "MacAddress": "02:72:36:05:c5:e3",
+                            "NetworkInterfaceId": "eni-07d68b5272d378146",
+                            "OwnerId": "290750254311",
+                            "PrivateDnsName": "ip-10-0-30-92.ap-southeast-2.compute.internal",
+                            "PrivateIpAddress": "10.0.30.92",
+                            "PrivateIpAddresses": [
+                                {
+                                    "Primary": true,
+                                    "PrivateDnsName": "ip-10-0-30-92.ap-southeast-2.compute.internal",
+                                    "PrivateIpAddress": "10.0.30.92"
+                                }
+                            ],
+                            "SourceDestCheck": true,
+                            "Status": "in-use",
+                            "SubnetId": "subnet-0cf12873f2932f86b",
+                            "VpcId": "vpc-03a82b4bd791b0ea7",
+                            "InterfaceType": "interface"
+                        }
+                    ],
+                    "RootDeviceName": "/dev/xvda",
+                    "RootDeviceType": "ebs",
+                    "SecurityGroups": [
+                        {
+                            "GroupName": "launch-wizard-8",
+                            "GroupId": "sg-0860bcbd8d9d2fd03"
+                        }
+                    ],
+                    "SourceDestCheck": true,
+                    "StateReason": {
+                        "Code": "Client.UserInitiatedShutdown",
+                        "Message": "Client.UserInitiatedShutdown: User initiated shutdown"
+                    },
+                    "Tags": [
+                        {
+                            "Key": "customer",
+                            "Value": "bob johns"
+                        },
+                        {
+                            "Key": "awssupport:patchwork",
+                            "Value": "patch"
+                        },
+                        {
+                            "Key": "product",
+                            "Value": "a tool for stuff"
+                        },
+                        {
+                            "Key": "Name",
+                            "Value": "smarshtest2"
+                        },
+                        {
+                            "Key": "product_family",
+                            "Value": "old stuff"
+                        }
+                    ],
+                    "VirtualizationType": "hvm",
+                    "CpuOptions": {
+                        "CoreCount": 1,
+                        "ThreadsPerCore": 1
+                    },
+                    "CapacityReservationSpecification": {
+                        "CapacityReservationPreference": "open"
+                    },
+                    "HibernationOptions": {
+                        "Configured": false
+                    },
+                    "MetadataOptions": {
+                        "State": "applied",
+                        "HttpTokens": "required",
+                        "HttpPutResponseHopLimit": 2,
+                        "HttpEndpoint": "enabled",
+                        "HttpProtocolIpv6": "disabled",
+                        "InstanceMetadataTags": "disabled"
+                    },
+                    "EnclaveOptions": {
+                        "Enabled": false
+                    },
+                    "BootMode": "uefi-preferred",
+                    "PlatformDetails": "Linux/UNIX",
+                    "UsageOperation": "RunInstances",
+                    "UsageOperationUpdateTime": "2023-12-07T02:59:38+00:00",
+                    "PrivateDnsNameOptions": {
+                        "HostnameType": "ip-name",
+                        "EnableResourceNameDnsARecord": false,
+                        "EnableResourceNameDnsAAAARecord": false
+                    },
+                    "MaintenanceOptions": {
+                        "AutoRecovery": "default"
+                    },
+                    "CurrentInstanceBootMode": "legacy-bios"
+                }
+            ],
+            "OwnerId": "290750254311",
+            "ReservationId": "r-0b0aa75558644f985"
+        },
+        {
+            "Groups": [],
+            "Instances": [
+                {
+                    "AmiLaunchIndex": 0,
+                    "ImageId": "ami-0361bbf2b99f46c1d",
+                    "InstanceId": "i-0cc4570f905b26bfa",
+                    "InstanceType": "t2.micro",
+                    "LaunchTime": "2023-12-07T02:58:04+00:00",
+                    "Monitoring": {
+                        "State": "disabled"
+                    },
+                    "Placement": {
+                        "AvailabilityZone": "ap-southeast-2a",
+                        "GroupName": "",
+                        "Tenancy": "default"
+                    },
+                    "PrivateDnsName": "ip-10-0-24-166.ap-southeast-2.compute.internal",
+                    "PrivateIpAddress": "10.0.24.166",
+                    "ProductCodes": [],
+                    "PublicDnsName": "",
+                    "State": {
+                        "Code": 80,
+                        "Name": "stopped"
+                    },
+                    "StateTransitionReason": "User initiated (2023-12-07 13:52:21 GMT)",
+                    "SubnetId": "subnet-0cf12873f2932f86b",
+                    "VpcId": "vpc-03a82b4bd791b0ea7",
+                    "Architecture": "x86_64",
+                    "BlockDeviceMappings": [
+                        {
+                            "DeviceName": "/dev/xvda",
+                            "Ebs": {
+                                "AttachTime": "2023-12-07T02:58:05+00:00",
+                                "DeleteOnTermination": true,
+                                "Status": "attached",
+                                "VolumeId": "vol-069ab3ddecd634bf4"
+                            }
+                        },
+                        {
+                            "DeviceName": "/dev/sdb",
+                            "Ebs": {
+                                "AttachTime": "2023-12-07T02:58:05+00:00",
+                                "DeleteOnTermination": false,
+                                "Status": "attached",
+                                "VolumeId": "vol-011fe2318d551d163"
+                            }
+                        }
+                    ],
+                    "ClientToken": "b1debf30-3507-4175-9cd3-49e842b95c73",
+                    "EbsOptimized": false,
+                    "EnaSupport": true,
+                    "Hypervisor": "xen",
+                    "IamInstanceProfile": {
+                        "Arn": "arn:aws:iam::290750254311:instance-profile/AWSSupportPatchwork-SSMRoleForInstances",
+                        "Id": "AIPAUHMQQZTTVFBKMRU2Z"
+                    },
+                    "NetworkInterfaces": [
+                        {
+                            "Attachment": {
+                                "AttachTime": "2023-12-07T02:58:04+00:00",
+                                "AttachmentId": "eni-attach-0c69c55d4c2a78371",
+                                "DeleteOnTermination": true,
+                                "DeviceIndex": 0,
+                                "Status": "attached",
+                                "NetworkCardIndex": 0
+                            },
+                            "Description": "",
+                            "Groups": [
+                                {
+                                    "GroupName": "launch-wizard-7",
+                                    "GroupId": "sg-02eac5804a8b453c4"
+                                }
+                            ],
+                            "Ipv6Addresses": [],
+                            "MacAddress": "02:ac:c7:f7:69:41",
+                            "NetworkInterfaceId": "eni-084a2155d06cc9666",
+                            "OwnerId": "290750254311",
+                            "PrivateDnsName": "ip-10-0-24-166.ap-southeast-2.compute.internal",
+                            "PrivateIpAddress": "10.0.24.166",
+                            "PrivateIpAddresses": [
+                                {
+                                    "Primary": true,
+                                    "PrivateDnsName": "ip-10-0-24-166.ap-southeast-2.compute.internal",
+                                    "PrivateIpAddress": "10.0.24.166"
+                                }
+                            ],
+                            "SourceDestCheck": true,
+                            "Status": "in-use",
+                            "SubnetId": "subnet-0cf12873f2932f86b",
+                            "VpcId": "vpc-03a82b4bd791b0ea7",
+                            "InterfaceType": "interface"
+                        }
+                    ],
+                    "RootDeviceName": "/dev/xvda",
+                    "RootDeviceType": "ebs",
+                    "SecurityGroups": [
+                        {
+                            "GroupName": "launch-wizard-7",
+                            "GroupId": "sg-02eac5804a8b453c4"
+                        }
+                    ],
+                    "SourceDestCheck": true,
+                    "StateReason": {
+                        "Code": "Client.UserInitiatedShutdown",
+                        "Message": "Client.UserInitiatedShutdown: User initiated shutdown"
+                    },
+                    "Tags": [
+                        {
+                            "Key": "deployment",
+                            "Value": "prod"
+                        },
+                        {
+                            "Key": "customer",
+                            "Value": "dave smith"
+                        },
+                        {
+                            "Key": "Name",
+                            "Value": "smarshtest1"
+                        },
+                        {
+                            "Key": "product_family",
+                            "Value": "some stuff"
+                        },
+                        {
+                            "Key": "product",
+                            "Value": "awesome thing"
+                        },
+                        {
+                            "Key": "feature",
+                            "Value": "amazing feature"
+                        },
+                        {
+                            "Key": "tier",
+                            "Value": "top"
+                        },
+                        {
+                            "Key": "awssupport:patchwork",
+                            "Value": "patch"
+                        }
+                    ],
+                    "VirtualizationType": "hvm",
+                    "CpuOptions": {
+                        "CoreCount": 1,
+                        "ThreadsPerCore": 1
+                    },
+                    "CapacityReservationSpecification": {
+                        "CapacityReservationPreference": "open"
+                    },
+                    "HibernationOptions": {
+                        "Configured": false
+                    },
+                    "MetadataOptions": {
+                        "State": "applied",
+                        "HttpTokens": "required",
+                        "HttpPutResponseHopLimit": 2,
+                        "HttpEndpoint": "enabled",
+                        "HttpProtocolIpv6": "disabled",
+                        "InstanceMetadataTags": "disabled"
+                    },
+                    "EnclaveOptions": {
+                        "Enabled": false
+                    },
+                    "BootMode": "uefi-preferred",
+                    "PlatformDetails": "Linux/UNIX",
+                    "UsageOperation": "RunInstances",
+                    "UsageOperationUpdateTime": "2023-12-07T02:58:04+00:00",
+                    "PrivateDnsNameOptions": {
+                        "HostnameType": "ip-name",
+                        "EnableResourceNameDnsARecord": false,
+                        "EnableResourceNameDnsAAAARecord": false
+                    },
+                    "MaintenanceOptions": {
+                        "AutoRecovery": "default"
+                    },
+                    "CurrentInstanceBootMode": "legacy-bios"
+                }
+            ],
+            "OwnerId": "290750254311",
+            "ReservationId": "r-0b677dcd2f817d5b5"
+        }
+    ]
+}
