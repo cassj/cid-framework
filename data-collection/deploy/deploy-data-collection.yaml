@@ -389,13 +389,13 @@ Resources:
               NumericLessThan:
                 s3:TlsVersion: 1.2
 
-  GlueDatabase: # GlueDatabase can be already created by crawler in previous versions. So we cannot create it here. See Init CustomResource
-    Type: "AWS::Glue::Database"
-    Properties:
-      CatalogId: !Ref AWS::AccountId
-      DatabaseInput:
-        Description: "CID Data Collection"
-        Name: !Ref DatabaseName
+#  GlueDatabase: # GlueDatabase can be already created by crawler in previous versions. So we cannot create it here. See Init CustomResource
+#    Type: "AWS::Glue::Database"
+#    Properties:
+#      CatalogId: !Ref AWS::AccountId
+#      DatabaseInput:
+#        Description: "CID Data Collection"
+#         Name: !Ref DatabaseName
 
   GlueRole:
     Type: AWS::IAM::Role
