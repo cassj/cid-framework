@@ -12,7 +12,7 @@ parameters:
   IncludeRDSUtilizationModule: 'yes'
   IncludeRightsizingModule: 'yes'
   IncludeTAModule: 'yes'
-  IncludeTransitGatewayModule: 'yes'
-  IncludeBackupModule: 'yes'
-  IncludeCostOptimizationHubModule: 'yes'
+  IncludeTransitGatewayModule: 'no'
+  IncludeBackupModule: 'no'
+  IncludeCostOptimizationHubModule: 'no'
 tags: {}
