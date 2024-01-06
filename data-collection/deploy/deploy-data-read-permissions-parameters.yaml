@@ -1,4 +1,4 @@
-template-file-path: 'data-collection/deploy/deploy-data-read-permissions.yaml '
+template-file-path: data-collection/deploy/deploy-data-read-permissions.yaml
 parameters:
   DataCollectionAccountId: '000826210026'
   CFNSourceBucket: cid-datacollection-templates-000826210026
@@ -7,12 +7,11 @@ parameters:
   IncludeBudgetsModule: 'yes'
   IncludeComputeOptimizerModule: 'yes'
   IncludeCostAnomalyModule: 'yes'
-  IncludeECSChargebackModule: 'yes'
+  IncludeECSChargebackModule: 'no'
   IncludeInventoryCollectorModule: 'yes'
-  IncludeRDSUtilizationModule: 'yes'
   IncludeRightsizingModule: 'yes'
   IncludeTAModule: 'yes'
   IncludeTransitGatewayModule: 'no'
-  IncludeBackupModule: 'no'
+  IncludeBackupModule: 'yes'
   IncludeCostOptimizationHubModule: 'no'
 tags: {}
