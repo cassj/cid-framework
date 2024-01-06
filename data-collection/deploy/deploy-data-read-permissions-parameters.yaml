@@ -1,12 +1,13 @@
 template-file-path: data-collection/deploy/deploy-data-read-permissions.yaml
 parameters:
-  DataCollectionAccountId: '000826210026'
+  DataCollectionAccountID: '000826210026'
   CFNSourceBucket: cid-datacollection-templates-000826210026
   AllowModuleReadInMgmt: 'yes'
   OrganizationalUnitIds: r-e8qn
   IncludeBudgetsModule: 'yes'
   IncludeComputeOptimizerModule: 'yes'
   IncludeCostAnomalyModule: 'yes'
+  IncludeRDSUtilizationModule: 'yes'
   IncludeECSChargebackModule: 'no'
   IncludeInventoryCollectorModule: 'yes'
   IncludeRightsizingModule: 'yes'
