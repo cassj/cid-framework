@@ -1,13 +1,13 @@
 template-file-path: data-collection/deploy/deploy-data-collection.yaml
 parameters:
-  CFNSourceBucket: cid-datacollection-templates000826210026
+  CFNSourceBucket: cid-datacollection-templates-000826210026
   ManagementAccountID: '774346427701'
-  IncludeTAModule: 'no'
-  IncludeRightsizingModule: 'no'
-  IncludeCostAnomalyModule: 'no'
+  IncludeTAModule: 'yes'
+  IncludeRightsizingModule: 'yes'
+  IncludeCostAnomalyModule: 'yes'
   IncludeInventoryCollectorModule: 'yes'
-  IncludeComputeOptimizerModule: 'no'
-  IncludeECSChargebackModule: ' no'
+  IncludeComputeOptimizerModule: 'yes'
+  IncludeECSChargebackModule: 'no'
   IncludeRDSUtilizationModule: 'yes'
   IncludeOrgDataModule: 'yes'
   IncludeBudgetsModule: 'yes'
