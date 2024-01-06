@@ -6,31 +6,76 @@ Metadata:
       - Label:
           default: 'Deployment parameters'
         Parameters:
-          - ManagementAccountDeploymentRole
-    ParameterLabels:
-      ManagementAccountDeploymentRole:
-        default: 'git-sync deployment role used in the management account'
+          - ManagementAccountGitSyncRoleName
+          - ManagementAccountCfnRoleName      
 
 Parameters:
-  ManagementAccountDeploymentRole:
+  ManagementAccountGitSyncRoleName:
     Type: String
-    Description: The name of the IAM role in the management account for git-sync deployments (not deployed in this stack)
-    Default: CIDGithubDeploymentRole
-
+    Description: IAM role used by git-sync in the management account
+    Default: CidGitSyncRole
+  ManagementAccountCfnRoleName:
+    Type: String
+    Description: 'IAM role used by CloudFormation to deploy CID data collection resources in the management account'
+    Default: CidCfnRole
+      
 Resources:
-  GithubDeploymentRole:
+  ManagementAccountGitSyncRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub "${ManagementAccountDeploymentRole}"
+      RoleName: !Sub "${ManagementAccountGitSyncRoleName}"
       AssumeRolePolicyDocument:
         Statement:
           - Action:
               - sts:AssumeRole
             Effect: Allow
             Principal:
-              Service:
-                - cloudformation.amazonaws.com
-                - cloudformation.sync.codeconnections.amazonaws.com 
+              Service: cloudformation.sync.codeconnections.amazonaws.com 
+        Version: 2012-10-17
+      Path: /
+      Policies:
+        - PolicyName: CidGitSyncPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: SyncToCloudFormation
+                Effect: Allow
+                Action: 
+                -  cloudformation:CreateChangeSet
+                -  cloudformation:DeleteChangeSet
+                -  cloudformation:DescribeChangeSet
+                -  cloudformation:DescribeStackEvents
+                -  cloudformation:DescribeStacks
+                -  cloudformation:ExecuteChangeSet
+                -  cloudformation:GetTemplate
+                -  cloudformation:ListChangeSets
+                -  cloudformation:ListStacks
+                -  cloudformation:ValidateTemplate
+                Resource: "*"
+              - Sid: PolicyForManagedRules
+                Effect: Allow
+                Action: 
+                - events:PutRule
+                - events:PutTargets
+                Resource: "*"
+                Condition: 
+                  StringEquals: 
+                    "events:ManagedBy": "cloudformation.sync.codeconnections.amazonaws.com"
+              - Sid: PolicyForDescribingRule
+                Effect: Allow
+                Action: "events:DescribeRule"
+                Resource: "*"
+  ManagementAccountCfnRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${ManagementAccountCfnRoleName}"
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: cloudformation.amazonaws.com 
         Version: 2012-10-17
       Path: /
       Policies:
@@ -41,7 +86,6 @@ Resources:
               - Effect: Allow
                 Action: "*"
                 Resource: "*"
-
 
 
 

@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: CID Data Collection git-sync bucket for nested templates
+Description: CID Data Collection utilities for GitSync
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
@@ -7,21 +7,11 @@ Metadata:
           default: 'Deployment parameters'
         Parameters:
           - NestedTemplateBucket
-          - ManagementAccountDeploymentRole
+          - CollectionAccountGitSyncRoleName
+          - CollectionAccountCfnRoleName  
+          - ManagementAccountCfnRoleName
           - ManagementAccountID
-          - CollectionAccountDeploymentRole
-          - CollectionAccountID
-    ParameterLabels:
-      NestedTemplateBucket:
-        default: 'S3 bucket for nested templates'
-      ManagementAccountDeploymentRole:
-        default: 'git-sync deployment role used in the management account'
-      ManagementAccountID:
-        default: 'Comma Delimited list of Account IDs for all Management Account IDs'
-      CollectionAccountDeploymentRole:
-        default: 'git-sync deployment role used in the Collection account'
-      CollectionAccountID:
-        default: 'Collection account ID'
+          
 
 Parameters:
   NestedTemplateBucket:
@@ -29,22 +19,22 @@ Parameters:
     Description: Name of the S3 Bucket that needs to be created to store nested templates (until git-sync supports this natively)
     AllowedPattern: (?=^.{3,36}$)(?!^(\d+\.)+\d+$)(^(([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])\.)*([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9\-])$)
     Default: cid-datacollection-templates
-  ManagementAccountDeploymentRole:
+  CollectionAccountGitSyncRoleName:
     Type: String
-    Description: The name of the IAM role in the management account for git-sync deployments (not deployed in this stack)
-    Default: CIDGithubDeploymentRole
+    Description: IAM role used by git-sync in the collection account
+    Default: CidGitSyncRole
+  CollectionAccountCfnRoleName:
+    Type: String
+    Description: IAM role used by CloudFormation to deploy CID data collection resources in the management account
+    Default: CidCfnRole
+  ManagementAccountCfnRoleName:
+    Type: String
+    Default: CidCfnRole
   ManagementAccountID:
     Type: String
     AllowedPattern: ([a-z0-9\-, ]*?$)
-    Description: "(Ex: 123456789,098654321,789054312) List of Payer IDs you wish to collect data for. Can just be one Accounts"
-  CollectionAccountDeploymentRole:
-    Type: String
-    Description: The name of the IAM role in the collection account for git-sync deployments (not deployed as part of this stack)
-    Default: CIDGithubDeploymentRole
-  CollectionAccountID:
-    Type: String
-    AllowedPattern: ([a-z0-9\-, ]*?$)
-    Description: "ID of the account in which your data collection stack will be deployed"
+    Description: Management account ID
+ 
 
 Outputs:
   S3Bucket:
@@ -55,19 +45,62 @@ Outputs:
     Value: !GetAtt S3Bucket.Arn
 
 Resources:
-  GithubDeploymentRole:
+  CollectionAccountGitSyncRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub "${CollectionAccountDeploymentRole}"
+      RoleName: !Sub "${CollectionAccountGitSyncRoleName}"
       AssumeRolePolicyDocument:
         Statement:
           - Action:
               - sts:AssumeRole
             Effect: Allow
             Principal:
-              Service:
-                - cloudformation.amazonaws.com
-                - cloudformation.sync.codeconnections.amazonaws.com 
+              Service: cloudformation.sync.codeconnections.amazonaws.com 
+        Version: 2012-10-17
+      Path: /
+      Policies:
+        - PolicyName: CidGitSyncPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: SyncToCloudFormation
+                Effect: Allow
+                Action: 
+                -  cloudformation:CreateChangeSet
+                -  cloudformation:DeleteChangeSet
+                -  cloudformation:DescribeChangeSet
+                -  cloudformation:DescribeStackEvents
+                -  cloudformation:DescribeStacks
+                -  cloudformation:ExecuteChangeSet
+                -  cloudformation:GetTemplate
+                -  cloudformation:ListChangeSets
+                -  cloudformation:ListStacks
+                -  cloudformation:ValidateTemplate
+                Resource: "*"
+              - Sid: PolicyForManagedRules
+                Effect: Allow
+                Action: 
+                - events:PutRule
+                - events:PutTargets
+                Resource: "*"
+                Condition: 
+                  StringEquals: 
+                    "events:ManagedBy": "cloudformation.sync.codeconnections.amazonaws.com"
+              - Sid: PolicyForDescribingRule
+                Effect: Allow
+                Action: "events:DescribeRule"
+                Resource: "*"
+  CollectionAccountCfnRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${CollectionAccountCfnRoleName}"
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: cloudformation.amazonaws.com 
         Version: 2012-10-17
       Path: /
       Policies:
@@ -78,11 +111,10 @@ Resources:
               - Effect: Allow
                 Action: "*"
                 Resource: "*"
-
   S3Bucket:
     Type: 'AWS::S3::Bucket'
     Properties:
-      BucketName: !Sub "${NestedTemplateBucket}${AWS::AccountId}"
+      BucketName: !Sub "${NestedTemplateBucket}-${AWS::AccountId}"
       VersioningConfiguration:
         Status: Suspended
       BucketEncryption:
@@ -123,8 +155,8 @@ Resources:
               - !Join ["", [!GetAtt S3Bucket.Arn, "/*"]]
             Principal: 
               AWS: 
-                - !Sub "arn:aws:iam::${ManagementAccountID}:role/${ManagementAccountDeploymentRole}"
-                - !Sub "arn:aws:iam::${CollectionAccountID}:role/${CollectionAccountDeploymentRole}"
+                - !Sub "arn:aws:iam::${ManagementAccountID}:role/${ManagementAccountCfnRoleName}"
+                - !Sub "arn:aws:iam::${AWS::AccountId}:role/${CollectionAccountCfnRoleName}"
 
 
 
