@@ -14,5 +14,5 @@ parameters:
   IncludeTAModule: 'yes'
   IncludeTransitGatewayModule: 'yes'
   IncludeBackupModule: 'yes'
-  IncludeCostOptimizationHubModule: 'yes'
+  IncludeCostOptimizationHubModule: 'no'
 tags: {}
