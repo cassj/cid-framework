@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: CID Data Collection git-sync bucket for nested templates
+Description: CID Data Collection utilities for GitSync
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:

@@ -30,6 +30,7 @@ Metadata:
           - IncludeRightsizingModule
           - IncludeTAModule
           - IncludeTransitGatewayModule
+          - IncludeS3StorageLensModule
     ParameterLabels:
       DestinationBucket:
         default: 'Destination S3 bucket'
@@ -73,6 +74,8 @@ Metadata:
         default: 'Include AWS Backup Collection Module'
       IncludeCostOptimizationHubModule:
         default: 'Include CostOptimizationHub Module'
+      IncludeS3StorageLensModule:
+        default: 'Include S3 Storage Lens Module'
 
 Mappings:
   RegionMap:
@@ -293,6 +296,12 @@ Parameters:
     AllowedValues:
       - "yes"
       - "no"
+  IncludeS3StorageLensModule:
+    Type: String
+    Description: Collects S3 Storage Lens data
+    AllowedValues:
+      - "yes"
+      - "no"
 
 Outputs:
   S3Bucket:
@@ -318,6 +327,7 @@ Conditions:
   DeployTransitGatewayModule: !Equals [ !Ref IncludeTransitGatewayModule, "yes"]
   DeployBackupModule: !Equals [ !Ref IncludeBackupModule, "yes"]
   DeployCostOptimizationHubModule: !Equals [ !Ref IncludeCostOptimizationHubModule, "yes"]
+  DeployS3StorageLensModule: !Equals [ !Ref IncludeS3StorageLensModule, "yes"]
   DeployPricingModule: !Or
     - !Condition DeployInventoryCollectorModule
     - !Condition DeployRDSUtilizationModule
@@ -340,6 +350,7 @@ Conditions:
     - !Join [ '', !Split [ ' ', !Ref RegionsInScope  ] ] # remove spaces
     - ""
   ProdCFNTemplateUsed: !Equals [ !Ref CFNSourceBucket,  'aws-managed-cost-intelligence-dashboards' ]
+
 
 Resources:
   S3Bucket:
@@ -1148,3 +1159,25 @@ Resources:
         ManagementRoleName: !Sub "${ResourcePrefix}${ManagementAccountRole}"
         ManagementAccountID: !Ref ManagementAccountID
         ResourcePrefix: !Ref ResourcePrefix
+
+  S3StorageLensModule:
+    Type: AWS::CloudFormation::Stack
+    Condition: DeployS3StorageLensModule
+    Properties:
+      TemplateURL: !Sub "https://${CFNSourceBucket}.s3.amazonaws.com/cfn/data-collection/module-s3-storage-lens.yaml" 
+      Parameters:
+        DestinationBucket: !Ref S3Bucket
+        ManagementRoleName: !Sub "${ResourcePrefix}${ManagementAccountRole}"
+        ManagementAccountID: !Ref ManagementAccountID
+        ResourcePrefix: !Ref ResourcePrefix
+        BucketPrefix:  !Ref DestinationBucket
+        Schedule: !Ref Schedule
+        LambdaAnalyticsARN: !GetAtt LambdaAnalytics.Arn
+        StepFunctionTemplate: !FindInMap [CodeTemplates, StepFunction, code]
+        StepFunctionExecutionRoleARN: !GetAtt StepFunctionExecutionRole.Arn
+        SchedulerExecutionRoleARN: !GetAtt SchedulerExecutionRole.Arn
+        RegionsInScope:
+          Fn::If:
+            - RegionsInScopeIsEmpty
+            - !Sub "${AWS::Region}"
+            - !Join [ '', !Split [ ' ', !Ref RegionsInScope  ] ] # remove spaces
