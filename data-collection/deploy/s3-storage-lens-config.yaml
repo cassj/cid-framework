@@ -1,0 +1,122 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates a StorageLens Configuration
+Parameters:
+  DestinationBucket:
+    Type: String
+    Description: Name of the S3 Bucket to be created to hold data information.
+    AllowedPattern: (?=^.{3,63}$)(?!^(\d+\.)+\d+$)(^(([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])\.)*([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])$)
+    Default: costoptimizationdata000826210026
+  ResourcePrefix:
+    Type: String
+    Description: This prefix will be placed in front of all roles created. Note you may wish to add a dash at the end to make more readable
+    Default: "CID-DC-"
+  CFDataName:
+    Type: String
+    Description: The name of what this cf is doing.
+    Default: s3-storage-lens
+  OrgArn:
+    Type: String
+    Description: Arn of the Organization
+  AccountActivityMetricsEnabled:
+    Type: String
+    AllowedValues:
+    - true
+    - false
+    Default: false
+  AccountAdvancedCostOptimizationMetricsEnabled:
+    Type: String
+    AllowedValues:
+    - true
+    - false
+    Default: false
+  AccountAdvancedDataProtectionMetricsEnabled:
+    Type: String
+    AllowedValues:
+    - true
+    - false
+    Default: false
+  AccountDetailedStatusCodesMetricsEnabled:
+    Type: String
+    AllowedValues:
+    - true
+    - false
+    Default: false
+  BucketActivityMetricsEnabled:
+    Type: String
+    AllowedValues:
+    - true
+    - false
+    Default: false
+  BucketAdvancedCostOptimizationMetricsEnabled:
+    Type: String
+    AllowedValues:
+    - true
+    - false
+    Default: false
+  BucketAdvancedDataProtectionMetricsEnabled:
+    Type: String
+    AllowedValues:
+    - true
+    - false
+    Default: false
+  BucketDetailedStatusCodesMetricsEnabled:
+    Type: String
+    AllowedValues:
+    - true
+    - false
+    Default: false
+  BucketPrefixStorageMetricsEnabled:
+    Type: String
+    AllowedValues:
+    - true
+    - false
+    Default: false
+
+Resources:
+  SLConfig:
+    Type: AWS::S3::StorageLens
+    Properties:
+      StorageLensConfiguration:
+        Id: !Sub "${ResourcePrefix}StorageLensConfiguration"
+        AccountLevel:
+          ActivityMetrics:
+            IsEnabled: true
+          AdvancedCostOptimizationMetrics:
+            IsEnabled: true
+          AdvancedDataProtectionMetrics:
+            IsEnabled: true
+          DetailedStatusCodesMetrics:
+            IsEnabled: true
+          BucketLevel:
+            ActivityMetrics:
+              IsEnabled: true
+            AdvancedCostOptimizationMetrics:
+              IsEnabled: true
+            AdvancedDataProtectionMetrics:
+              IsEnabled: true
+            DetailedStatusCodesMetrics:
+              IsEnabled: true
+            PrefixLevel:
+              StorageMetrics:
+                IsEnabled: true
+                SelectionCriteria:
+                  MaxDepth: 5
+                  MinStorageBytesPercentage: 1.23
+                  Delimiter: "/"
+        IsEnabled: true
+        AwsOrg: 
+          Arn: !Sub "${OrgArn}"
+        DataExport:
+          S3BucketDestination:
+            OutputSchemaVersion: "V_1"
+            Format: "Parquet"
+            AccountId: !Sub "${AWS::AccountId}"
+            Arn: !Sub 'arn:aws:s3:::destination_bucket'
+            Prefix: !Sub "${CFDataName}"
+            Encryption:
+              SSES3: {}
+          CloudWatchMetrics:
+            IsEnabled: false
+      Tags:
+        - Key: "Name"
+          Value: !Sub "${ResourcePrefix}StorageLensConfiguration"
