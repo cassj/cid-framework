@@ -14,6 +14,7 @@ parameters:
   IncludeTAModule: 'no'
   IncludeTransitGatewayModule: 'no'
   IncludeBackupModule: 'no'
-  IncludeSupportCasesModule: 'yes'
-  IncludeServiceQuotasModule: 'no'
+  IncludeS3StorageLensModule: 'no'
+  IncludeCostOptimizationHubModule: 'no'
+
 tags: {}
