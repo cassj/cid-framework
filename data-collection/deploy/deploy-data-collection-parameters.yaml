@@ -13,4 +13,5 @@ parameters:
   IncludeBudgetsModule: 'yes'
   IncludeTransitGatewayModule: 'no'
   IncludeBackupModule: 'no'
+  IncludeSupportCasesModule: 'yes'
 tags: {}
