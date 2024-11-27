@@ -12,7 +12,6 @@ print(repo.git.execute('git pull'.split()))
 old_ver = json.load(open("data-collection/utils/version.json"))['version']
 
 print (old_ver)
-exit()
 bump='patch'
 if len(sys.argv)>1:
 	bump = sys.argv[1]
@@ -29,8 +28,8 @@ else:
 print(repo.git.execute(f"git checkout -b release/{new_ver}".split()))
 
 
-tx = open('data-collection/utils/_version.py').read()
-with open('data-collection/utils/_version.py', "w") as f:
+tx = open("data-collection/utils/version.json").read()
+with open("data-collection/utils/version.json", "w") as f:
 	f.write(tx.replace(old_ver,new_ver))
 
 
@@ -39,6 +38,7 @@ filenames = [
     'data-collection/deploy/deploy-data-collection.yaml',
     'data-collection/deploy/deploy-in-management-account.yaml',
     'data-collection/deploy/deploy-in-linked-account.yaml',
+	"data-collection/utils/version.json",
 ]
 for filename in filenames:
 	tx = open(filename).read()

@@ -35,9 +35,12 @@ Parameters:
   AccountCollectorLambdaARN:
     Type: String
     Description: Arn of the Account Collector Lambda
+  CodeBucket:
+    Type: String
+    Description: Source code bucket
   StepFunctionTemplate:
     Type: String
-    Description: JSON representation of common StepFunction template
+    Description: S3 key to the JSON template for the StepFunction
   StepFunctionExecutionRoleARN:
     Type: String
     Description: Common role for Step Function execution
@@ -69,7 +72,7 @@ Resources:
                 - lambda.amazonaws.com
         Version: 2012-10-17
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - !Sub "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
       Path: /
       Policies:
         - PolicyName: !Sub "${CFDataName}-ManagementAccount-LambdaRole"
@@ -78,7 +81,7 @@ Resources:
             Statement:
               - Effect: "Allow"
                 Action: "sts:AssumeRole"
-                Resource: !Sub "arn:aws:iam::*:role/${ManagementRoleName}" # Need to assume a Read role in management accounts
+                Resource: !Sub "arn:${AWS::Partition}:iam::*:role/${ManagementRoleName}" # Need to assume a Read role in management accounts
         - PolicyName: "S3-Access"
           PolicyDocument:
             Version: "2012-10-17"
@@ -99,13 +102,14 @@ Resources:
     Properties:
       FunctionName: !Sub '${ResourcePrefix}${CFDataName}-Lambda'
       Description: !Sub "Lambda function to retrieve ${CFDataName}"
-      Runtime: python3.10
+      Runtime: python3.12
       Architectures: [x86_64]
       Code:
         ZipFile: |
           """ Get Account info from AWS Organizations and store on s3 bucket
           """
           import os
+          import re
           import json
           import logging
           import datetime
@@ -139,8 +143,9 @@ Resources:
           def process_management_acc(management_account_id):
               """Get info from management account and write to s3"""
               logger.info(f'Assuming role {ROLE} in {management_account_id}')
+              partition = boto3.session.Session().get_partition_for_region(region_name=REGIONS[0])
               cred = boto3.client('sts', region_name=REGIONS[0]).assume_role(
-                  RoleArn=f"arn:aws:iam::{management_account_id}:role/{ROLE}",
+                  RoleArn=f"arn:{partition}:iam::{management_account_id}:role/{ROLE}",
                   RoleSessionName="data_collection"
               )['Credentials']
               client = boto3.client(
@@ -171,7 +176,7 @@ Resources:
           def json_converter(obj):
               """ Help json encode date"""
               if isinstance(obj, datetime.datetime):
-                  return obj.strftime("%Y-%d-%m %H:%M:%S")
+                  return obj.strftime("%Y-%m-%d %H:%M:%S")
               return obj
 
           class OrgController():
@@ -208,7 +213,7 @@ Resources:
                   return path[::-1]
 
               @lru_cache(maxsize=10000)
-              def get_tags(self, id_):
+              def get_tags(self, id_, athena_friendly=False):
                   """returns a dict of tags"""
                   paginator = self.org.get_paginator("list_tags_for_resource")
                   tags = sum([resp['Tags'] for resp in paginator.paginate(ResourceId=id_)], [])
@@ -220,7 +225,7 @@ Resources:
                   tags = {}
                   full_path = self.get_ou_path(id_) + [{'Id': id_}]
                   for level in full_path:
-                      tags.update(self.get_tags(level['Id']))
+                      tags.update(self.get_tags(level['Id'], athena_friendly=True))
                   return tags
 
               def iterate_accounts(self):
@@ -232,11 +237,11 @@ Resources:
                           account['HierarchyPath'] = ' > '.join([
                               lvl.get('Name', lvl.get('Id')) for lvl in account['Hierarchy']
                           ])
-                          account['HierarchyTags'] = self.get_hierarchy_tags(account['Id'])
+                          account['HierarchyTags'] = [ {'Key': key, 'Value': value} for key, value in self.get_hierarchy_tags(account['Id']).items()]
                           account['ManagementAccountId'] =  account['Arn'].split(':')[4]
                           account['Parent'] = account['Hierarchy'][-1].get('Name')
                           account['ParentId'] = account['Hierarchy'][-1].get('Id')
-                          account['ParentTags'] = self.get_tags(account['ParentId'])
+                          account['ParentTags'] = [ {'Key': key, 'Value': value} for key, value in self.get_tags(account['ParentId']).items()]
                           #account['Parent_Tags'] = self.get_tags(account['ParentId']) # Uncomment for Backward Compatibility
                           logger.debug(json.dumps(account, indent=2, default=json_converter))
                           yield account
@@ -288,7 +293,9 @@ Resources:
       StateMachineName: !Sub '${ResourcePrefix}${CFDataName}-StateMachine'
       StateMachineType: STANDARD
       RoleArn: !Ref StepFunctionExecutionRoleARN
-      DefinitionString: !Ref StepFunctionTemplate
+      DefinitionS3Location:
+        Bucket: !Ref CodeBucket
+        Key: !Ref StepFunctionTemplate
       DefinitionSubstitutions:
         AccountCollectorLambdaARN: !Ref AccountCollectorLambdaARN
         ModuleLambdaARN: !GetAtt LambdaFunction.Arn

@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: CID Data Collection - Role for Management Account v3.0.0
+Description: CID Data Collection - Role for Management Account v3.5.0
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
@@ -15,9 +15,11 @@ Metadata:
           - IncludeBackupModule
           - IncludeComputeOptimizerModule
           - IncludeCostAnomalyModule
-          - IncludeCostOptimizationHubModule
+          - IncludeSupportCasesModule
+          - IncludeHealthEventsModule
           - IncludeRightsizingModule
-          - IncludeS3StorageLensModule
+          - IncludeLicenseManagerModule
+          - IncludeServiceQuotasModule
     ParameterLabels:
       ManagementAccountRole:
         default: "Management account role"
@@ -29,14 +31,18 @@ Metadata:
         default: "Include AWS Compute Optimizer Data Collection Module"
       IncludeCostAnomalyModule:
         default: "Include Cost Anomalies Data Collection Module"
+      IncludeSupportCasesModule:
+        default: "Include Support Cases Data Collection Module"
       IncludeRightsizingModule:
         default: "Include Rightsizing Recommendations Data Collection Module"
       IncludeBackupModule:
         default: "Include AWS Backup Collection Module"
-      IncludeCostOptimizationHubModule:
-        default: "Include EnableCostOptimizationHub Module"
-      IncludeS3StorageLensModule:
-        default: "Include S3 Storage Lens Module"
+      IncludeHealthEventsModule:
+        default: "Include Health Events Module"
+      IncludeLicenseManagerModule:
+        default: "Include Marketplace Licensing Module"
+      IncludeServiceQuotasModule:
+        default: "Include Service Quotas Module"
 Parameters:
   DataCollectionAccountID:
     Type: String
@@ -52,47 +58,53 @@ Parameters:
   IncludeComputeOptimizerModule:
     Type: String
     Description: Collects AWS Compute Optimizer service recommendations
-    AllowedValues:
-      - "yes"
-      - "no"
+    AllowedValues: ['yes', 'no']
+    Default: 'no'
   IncludeCostAnomalyModule:
     Type: String
     Description: "Collects AWS Cost Explorer Cost Anomalies Recommendations"
-    AllowedValues:
-      - "yes"
-      - "no"
+    AllowedValues: ['yes', 'no']
+    Default: 'no'
+  IncludeSupportCasesModule:
+    Type: String
+    Description: "Collects AWS Support Cases data"
+    AllowedValues: ['yes', 'no']
+    Default: 'no'
   IncludeRightsizingModule:
     Type: String
     Description: "Collects AWS Cost Explorer Rightsizing Recommendations"
-    AllowedValues:
-      - "yes"
-      - "no"
+    AllowedValues: ['yes', 'no']
+    Default: 'no'
   IncludeBackupModule:
     Type: String
     Description: Collects TransitGateway from your accounts
-    AllowedValues:
-      - "yes"
-      - "no"
-  IncludeCostOptimizationHubModule:
+    AllowedValues: ['yes', 'no']
+    Default: 'no'
+  IncludeHealthEventsModule:
     Type: String
-    Description: Collects CostOptimizationHub Recommendations from your accounts
-    AllowedValues:
-      - "yes"
-      - "no"
-  IncludeS3StorageLensModule:
+    Description: Collects AWS Health Events from your accounts
+    AllowedValues: ['yes', 'no']
+    Default: 'no'
+  IncludeLicenseManagerModule:
     Type: String
-    Description: Collects S3 Storage Lens Metrics from your accounts
-    AllowedValues:
-      - "yes"
-      - "no"
+    Description: Collects Marketplace Licensing Information from your accounts
+    AllowedValues: ['yes', 'no']
+    Default: 'no'
+  IncludeServiceQuotasModule:
+    Type: String
+    Description: Collects Service Quotas Information from your accounts
+    AllowedValues: ['yes', 'no']
+    Default: 'no'
 
 Conditions:
   EnableComputeOptimizerModule: !Equals [!Ref IncludeComputeOptimizerModule, "yes"]
   EnableCostAnomaliesModule: !Equals [!Ref IncludeCostAnomalyModule, "yes"]
+  EnableSupportCasesModule: !Equals [!Ref IncludeSupportCasesModule, "yes"]
   EnableRightsizingModule: !Equals [!Ref IncludeRightsizingModule, "yes"]
   EnableBackupModule: !Equals [!Ref IncludeBackupModule, "yes"]
-  EnableCostOptimizationHubModule: !Equals [!Ref IncludeCostOptimizationHubModule, "yes"]
-  EnableS3StorageLensModule: !Equals [!Ref IncludeS3StorageLensModule, "yes"]
+  EnableHealthEventsModule: !Equals [!Ref IncludeHealthEventsModule, "yes"]
+  EnableLicenseManagerModule: !Equals [!Ref IncludeLicenseManagerModule, "yes"]
+  EnableServiceQuotasModule: !Equals [!Ref IncludeServiceQuotasModule, "yes"]
 
 Outputs:
   LambdaRole:
@@ -111,18 +123,22 @@ Resources:
             Effect: Allow
             Principal:
               AWS:
-                - !Sub "arn:aws:iam::${DataCollectionAccountID}:root"
+                - !Sub "arn:${AWS::Partition}:iam::${DataCollectionAccountID}:root"
             Condition:
               ForAnyValue:ArnEquals:
                 aws:PrincipalArn:
-                  - !Sub "arn:aws:iam::${DataCollectionAccountID}:role/${ResourcePrefix}account-collector-LambdaRole"
-                  - !Sub "arn:aws:iam::${DataCollectionAccountID}:role/${ResourcePrefix}organizations-LambdaRole"
-                  - !Sub "arn:aws:iam::${DataCollectionAccountID}:role/${ResourcePrefix}compute-optimizer-LambdaRole"
-                  - !Sub "arn:aws:iam::${DataCollectionAccountID}:role/${ResourcePrefix}cost-anomaly-LambdaRole"
-                  - !Sub "arn:aws:iam::${DataCollectionAccountID}:role/${ResourcePrefix}cost-explorer-rightsizing-LambdaRole"
-                  - !Sub "arn:aws:iam::${DataCollectionAccountID}:role/${ResourcePrefix}cost-optimization-hub-LambdaRole"
-                  - !Sub "arn:aws:iam::${DataCollectionAccountID}:role/${ResourcePrefix}backup-LambdaRole"
-                  - !Sub "arn:aws:iam::${DataCollectionAccountID}:role/${ResourcePrefix}s3-storage-lens-LambdaRole"
+                  - !Sub "arn:${AWS::Partition}:iam::${DataCollectionAccountID}:role/${ResourcePrefix}account-collector-LambdaRole"
+                  - !Sub "arn:${AWS::Partition}:iam::${DataCollectionAccountID}:role/${ResourcePrefix}organizations-LambdaRole"
+                  - !Sub "arn:${AWS::Partition}:iam::${DataCollectionAccountID}:role/${ResourcePrefix}compute-optimizer-LambdaRole"
+                  - !Sub "arn:${AWS::Partition}:iam::${DataCollectionAccountID}:role/${ResourcePrefix}cost-anomaly-LambdaRole"
+                  - !Sub "arn:${AWS::Partition}:iam::${DataCollectionAccountID}:role/${ResourcePrefix}support-cases-LambdaRole"
+                  - !Sub "arn:${AWS::Partition}:iam::${DataCollectionAccountID}:role/${ResourcePrefix}support-cases-summarization-LambdaRole"
+                  - !Sub "arn:${AWS::Partition}:iam::${DataCollectionAccountID}:role/${ResourcePrefix}cost-explorer-rightsizing-LambdaRole"
+                  - !Sub "arn:${AWS::Partition}:iam::${DataCollectionAccountID}:role/${ResourcePrefix}backup-LambdaRole"
+                  - !Sub "arn:${AWS::Partition}:iam::${DataCollectionAccountID}:role/${ResourcePrefix}health-events-LambdaRole"
+                  - !Sub "arn:${AWS::Partition}:iam::${DataCollectionAccountID}:role/${ResourcePrefix}license-manager-LambdaRole"
+                  - !Sub "arn:${AWS::Partition}:iam::${DataCollectionAccountID}:role/${ResourcePrefix}RLS-LambdaRole"
+                  - !Sub "arn:${AWS::Partition}:iam::${DataCollectionAccountID}:role/${ResourcePrefix}service-quotas-LambdaRole"
       Path: /
     Metadata:
       cfn_nag:
@@ -198,6 +214,26 @@ Resources:
         rules_to_suppress:
           - id: W12
             reason: "Policy is used for scanning of a wide range of resources"
+  SupportCasesPolicy:
+    Type: "AWS::IAM::Policy"
+    Condition: EnableSupportCasesModule
+    Properties:
+      PolicyName: SupportCasesPolicy
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action:
+              - "support:DescribeCases"
+              - "support:DescribeCommunications"
+            Resource: "*"
+      Roles:
+        - Ref: LambdaRole
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W12
+            reason: "Policy is used for scanning of a wide range of resources"
   BackupPolicy:
     Type: "AWS::IAM::Policy"
     Condition: EnableBackupModule
@@ -222,11 +258,11 @@ Resources:
         rules_to_suppress:
           - id: W12
             reason: "Policy is used for scanning of a wide range of resources"
-  COExportLambdaFunctionRecommendations:
+  COExportRecommendations:
     Type: "AWS::IAM::Policy"
     Condition: EnableComputeOptimizerModule
     Properties:
-      PolicyName: ComputeOptimizer-ExportLambdaFunctionRecommendations
+      PolicyName: ComputeOptimizer-ExportRecommendations
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -237,84 +273,24 @@ Resources:
               - "lambda:ListFunctions"
               - "lambda:ListProvisionedConcurrencyConfigs"
             Resource: "*"
-      Roles:
-        - Ref: LambdaRole
-    Metadata:
-      cfn_nag:
-        rules_to_suppress:
-          - id: W12
-            reason: "Policy is used for scanning of a wide range of resources"
-  COExportAutoScalingGroupRecommendations:
-    Type: "AWS::IAM::Policy"
-    Condition: EnableComputeOptimizerModule
-    Properties:
-      PolicyName: ComputeOptimizer-ExportAutoScalingGroupRecommendations
-      PolicyDocument:
-        Version: "2012-10-17"
-        Statement:
           - Effect: "Allow"
             Action:
               - "compute-optimizer:ExportAutoScalingGroupRecommendations"
               - "compute-optimizer:GetAutoScalingGroupRecommendations"
               - "autoscaling:DescribeAutoScalingGroups"
             Resource: "*"
-      Roles:
-        - Ref: LambdaRole
-    Metadata:
-      cfn_nag:
-        rules_to_suppress:
-          - id: W12
-            reason: "Policy is used for scanning of a wide range of resources"
-  COExportEBSVolumeRecommendations:
-    Type: "AWS::IAM::Policy"
-    Condition: EnableComputeOptimizerModule
-    Properties:
-      PolicyName: ComputeOptimizer-ExportEBSVolumeRecommendations
-      PolicyDocument:
-        Version: "2012-10-17"
-        Statement:
           - Effect: "Allow"
             Action:
               - "compute-optimizer:ExportEBSVolumeRecommendations"
               - "compute-optimizer:GetEBSVolumeRecommendations"
-              - "EC2:DescribeVolumes"
+              - "ec2:DescribeVolumes"
             Resource: "*"
-      Roles:
-        - Ref: LambdaRole
-    Metadata:
-      cfn_nag:
-        rules_to_suppress:
-          - id: W12
-            reason: "Policy is used for scanning of a wide range of resources"
-  COExportEC2InstanceRecommendations:
-    Type: "AWS::IAM::Policy"
-    Condition: EnableComputeOptimizerModule
-    Properties:
-      PolicyName: ComputeOptimizer-ExportEC2InstanceRecommendations
-      PolicyDocument:
-        Version: "2012-10-17"
-        Statement:
           - Effect: "Allow"
             Action:
               - "compute-optimizer:ExportEC2InstanceRecommendations"
               - "compute-optimizer:GetEC2InstanceRecommendations"
-              - "EC2:DescribeInstances"
+              - "ec2:DescribeInstances"
             Resource: "*"
-      Roles:
-        - Ref: LambdaRole
-    Metadata:
-      cfn_nag:
-        rules_to_suppress:
-          - id: W12
-            reason: "Policy is used for scanning of a wide range of resources"
-  COExportECSRecommendations:
-    Type: "AWS::IAM::Policy"
-    Condition: EnableComputeOptimizerModule
-    Properties:
-      PolicyName: ComputeOptimizer-ExportECSRecommendations
-      PolicyDocument:
-        Version: "2012-10-17"
-        Statement:
           - Effect: "Allow"
             Action:
               - "compute-optimizer:ExportECSServiceRecommendations"
@@ -323,55 +299,19 @@ Resources:
               - "ecs:ListServices"
               - "ecs:ListClusters"
             Resource: "*"
-      Roles:
-        - Ref: LambdaRole
-    Metadata:
-      cfn_nag:
-        rules_to_suppress:
-          - id: W12
-            reason: "Policy is used for scanning of a wide range of resources"
-  COExportLicenseRecommendations:
-    Type: "AWS::IAM::Policy"
-    Condition: EnableComputeOptimizerModule
-    Properties:
-      PolicyName: ComputeOptimizer-ExportLicenseRecommendations
-      PolicyDocument:
-        Version: "2012-10-17"
-        Statement:
           - Effect: "Allow"
             Action:
               - "compute-optimizer:ExportLicenseRecommendations"
               - "compute-optimizer:GetLicenseRecommendations"
               - "ec2:DescribeInstances"
             Resource: "*"
-      Roles:
-        - Ref: LambdaRole
-    Metadata:
-      cfn_nag:
-        rules_to_suppress:
-          - id: W12
-            reason: "Policy is used for scanning of a wide range of resources"
-  CostOptimizationHubRecommendations:
-    Type: "AWS::IAM::Policy"
-    Condition: EnableCostOptimizationHubModule
-    Properties:
-      PolicyName: CostOptimizationHubRecommendations
-      PolicyDocument:
-        Version: "2012-10-17"
-        Statement:
           - Effect: "Allow"
             Action:
-              - "cost-optimization-hub:ListEnrollmentStatuses"
-              - "cost-optimization-hub:GetPreferences"
-              - "cost-optimization-hub:GetRecommendation"
-              - "cost-optimization-hub:ListRecommendations"
-              - "cost-optimization-hub:ListRecommendationSummaries"
-              - "organizations:DescribeOrganization"
-              - "organizations:ListAccounts"
-              - "organizations:ListAWSServiceAccessForOrganization"
-              - "organizations:ListParents"
-              - "organizations:DescribeOrganizationalUnit"
-              - "ce:ListCostAllocationTags"
+              - "compute-optimizer:ExportRDSDatabaseRecommendations"
+              - "compute-optimizer:GetRDSDatabaseRecommendations"
+              - "compute-optimizer:GetRDSDatabaseRecommendationProjectedMetrics"
+              - "rds:DescribeDBInstances"
+              - "rds:DescribeDBClusters"
             Resource: "*"
       Roles:
         - Ref: LambdaRole
@@ -380,28 +320,73 @@ Resources:
         rules_to_suppress:
           - id: W12
             reason: "Policy is used for scanning of a wide range of resources"
-  S3StorageLensPolicy:
+  HealthEventsPolicy:
     Type: "AWS::IAM::Policy"
-    Condition: EnableS3StorageLensModule
+    Condition: EnableHealthEventsModule
     Properties:
-      PolicyName: S3StorageLensPolicy
+      PolicyName: HealthEventsPolicy
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
           - Effect: "Allow"
             Action:
-              - "organizations:EnableAWSServiceAccess"
-              - "organizations:DescribeOrganization"
-              - "organizations:ListAccounts"
-              - "organizations:ListAWSServiceAccessForOrganization"
-              - "organizations:RegisterDelegatedAdministrator"
-              - "organizations:DeregisterDelegatedAdministrator"
-              - "iam:CreateServiceLinkedRole"
-            Resource: "*"          
+              - "health:DescribeEventsForOrganization"
+              - "health:DescribeEventDetailsForOrganization"
+              - "health:DescribeAffectedAccountsForOrganization"
+              - "health:DescribeAffectedEntitiesForOrganization"
+            Resource: "*"
       Roles:
         - Ref: LambdaRole
     Metadata:
       cfn_nag:
         rules_to_suppress:
           - id: W12
-            reason: "ToDo - scope down Resource for ServiceRole"
+            reason: "Policy is used for scanning of a wide range of resources"
+  LicenseManagerPolicy:
+    Type: "AWS::IAM::Policy"
+    Condition: EnableLicenseManagerModule
+    Properties:
+      PolicyName: LicenseManagerPolicy
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action:
+              - "license-manager:ListReceivedGrants"
+              - "license-manager:ListReceivedLicenses"
+              - "license-manager:ListReceivedGrantsForOrganization"
+            Resource: "*"
+      Roles:
+        - Ref: LambdaRole
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W12
+            reason: "Policy is used for scanning of a wide range of resources"
+  ServiceQuotasPolicy:
+    Type: "AWS::IAM::Policy"
+    Condition: EnableServiceQuotasModule
+    Properties:
+      PolicyName: ServiceQuotasPolicy
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action:
+              - "servicequotas:ListRequestedServiceQuotaChangeHistory"
+              - "servicequotas:GetServiceQuota"
+              - "servicequotas:GetAWSDefaultServiceQuota"
+              - "rds:DescribeAccountAttributes"
+              - "elasticloadbalancing:DescribeAccountLimits"
+              - "dynamodb:DescribeLimits"
+              - "cloudformation:DescribeAccountLimits"
+              - "autoscaling:DescribeAccountLimits"
+              - "route53:GetAccountLimit"
+            Resource: "*" ## Policy is used for scanning a wide range of resources. All service quotas in this case. All of them.
+      Roles:
+        - Ref: LambdaRole
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W12
+            reason: "Policy is used for scanning of a wide range of resources"

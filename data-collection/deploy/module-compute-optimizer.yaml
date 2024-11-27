@@ -42,9 +42,12 @@ Parameters:
   AccountCollectorLambdaARN:
     Type: String
     Description: Arn of the Account Collector Lambda
+  CodeBucket:
+    Type: String
+    Description: Source code bucket
   StepFunctionTemplate:
     Type: String
-    Description: JSON representation of common StepFunction template
+    Description: S3 key to the JSON template for the StepFunction
   StepFunctionExecutionRoleARN:
     Type: String
     Description: Common role for Step Function execution
@@ -78,7 +81,7 @@ Resources:
             Statement:
               - Effect: Allow
                 Action: sts:AssumeRole
-                Resource: !Sub "arn:aws:iam::*:role/${ResourcePrefix}ComputeOptimizer-StackSetExecutionRole"
+                Resource: !Sub "arn:${AWS::Partition}:iam::*:role/${ResourcePrefix}ComputeOptimizer-StackSetExecutionRole"
     Metadata:
       cfn_nag:
         rules_to_suppress:
@@ -108,7 +111,7 @@ Resources:
                   - cloudformation:DescribeStacks
                   - cloudformation:DeleteStack
                   - cloudformation:UpdateStack
-                Resource: !Sub 'arn:aws:cloudformation:*:${AWS::AccountId}:stack/StackSet-${ResourcePrefix}ComputeOptimizerBuckets*'
+                Resource: !Sub 'arn:${AWS::Partition}:cloudformation:*:${AWS::AccountId}:stack/StackSet-${ResourcePrefix}ComputeOptimizerBuckets*'
         - PolicyName: ResourcesPolicy
           PolicyDocument:
             Version: '2012-10-17'
@@ -124,7 +127,7 @@ Resources:
                   - s3:Replicate*
                   - s3:DeleteBucketPolicy
                 Resource:
-                  - !Sub 'arn:aws:s3:::${BucketPrefix}${AWS::AccountId}.*'
+                  - !Sub 'arn:${AWS::Partition}:s3:::${BucketPrefix}${AWS::AccountId}.*'
               - Effect: Allow
                 Action:
                   - iam:GetRole
@@ -134,9 +137,10 @@ Resources:
                   - iam:DeleteRolePolicy
                   - iam:GetRolePolicy
                   - iam:PutRolePolicy
+                  - iam:TagRole
                 Resource:
-                  - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${ResourcePrefix}Compute-Optimizer-Replication-*'
-                  - !Sub 'arn:aws:iam::${AWS::AccountId}:role/StackSet-${ResourcePrefix}ComputeOptimizer*' # For Compatibility with older versions: Shorter version of StackSetName
+                  - !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${ResourcePrefix}Compute-Optimizer-Replication-*'
+                  - !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/StackSet-${ResourcePrefix}ComputeOptimizer*' # For Compatibility with older versions: Shorter version of StackSetName
     Metadata:
       cfn_nag:
         rules_to_suppress:
@@ -202,7 +206,7 @@ Resources:
                   Action:
                   - s3:GetBucketAcl
                   - s3:GetBucketPolicyStatus
-                  Resource: !Sub "arn:aws:s3:::${Name}.${AWS::Region}"
+                  Resource: !Sub "arn:${AWS::Partition}:s3:::${Name}.${AWS::Region}"
                 - Effect: Allow
                   Principal:
                     Service: compute-optimizer.amazonaws.com
@@ -211,7 +215,7 @@ Resources:
                     StringEquals:
                           s3:x-amz-acl:  bucket-owner-full-control
                           aws:SourceAccount: !Split [',', !Ref ManagementAccountID]
-                  Resource: !Sub "arn:aws:s3:::${Name}.${AWS::Region}/*"
+                  Resource: !Sub "arn:${AWS::Partition}:s3:::${Name}.${AWS::Region}/*"
                 - Effect: Deny
                   Principal: "*"
                   Action: s3:*
@@ -219,15 +223,15 @@ Resources:
                     Bool:
                       aws:SecureTransport: 'false'
                   Resource:
-                    - !Sub "arn:aws:s3:::${Name}.${AWS::Region}"
-                    - !Sub "arn:aws:s3:::${Name}.${AWS::Region}/*"
+                    - !Sub "arn:${AWS::Partition}:s3:::${Name}.${AWS::Region}"
+                    - !Sub "arn:${AWS::Partition}:s3:::${Name}.${AWS::Region}/*"
                 - Sid: AllowTLS12Only
                   Effect: Deny
                   Principal: "*"
                   Action: s3:*
                   Resource:
-                    - !Sub "arn:aws:s3:::${Name}.${AWS::Region}"
-                    - !Sub "arn:aws:s3:::${Name}.${AWS::Region}/*"
+                    - !Sub "arn:${AWS::Partition}:s3:::${Name}.${AWS::Region}"
+                    - !Sub "arn:${AWS::Partition}:s3:::${Name}.${AWS::Region}/*"
                   Condition:
                     NumericLessThan:
                       s3:TlsVersion: 1.2
@@ -241,29 +245,26 @@ Resources:
                   Effect: Allow
                   Principal:
                     Service: [s3.amazonaws.com]
-          RegionalBucketReplicaRolePolicy:
-            Type: AWS::IAM::Policy
-            Properties:
-              PolicyName: Replication
-              PolicyDocument:
-                Statement:
-                - Action:
-                  - s3:GetReplicationConfiguration
-                  - s3:ListBucket
-                  Resource: !Sub arn:aws:s3:::${Name}.${AWS::Region}
-                  Effect: 'Allow'
-                - Action:
-                  - s3:GetObjectVersionForReplication
-                  - s3:GetObjectVersionAcl
-                  Resource: !Sub arn:aws:s3:::${Name}.${AWS::Region}/*
-                  Effect: 'Allow'
-                - Action:
-                  - s3:ReplicateObject
-                  - s3:ReplicateTags
-                  - s3:GetObjectVersionTagging
-                  Effect: 'Allow'
-                  Resource: !Sub arn:aws:s3:::${DestinationBucket}/*
-              Roles: [!Ref 'RegionalBucketReplicaRole']
+              Policies:
+              - PolicyName: Replication
+                PolicyDocument:
+                  Statement:
+                  - Action:
+                    - s3:GetReplicationConfiguration
+                    - s3:ListBucket
+                    Resource: !Sub arn:${AWS::Partition}:s3:::${Name}.${AWS::Region}
+                    Effect: 'Allow'
+                  - Action:
+                    - s3:GetObjectVersionForReplication
+                    - s3:GetObjectVersionAcl
+                    Resource: !Sub arn:${AWS::Partition}:s3:::${Name}.${AWS::Region}/*
+                    Effect: 'Allow'
+                  - Action:
+                    - s3:ReplicateObject
+                    - s3:ReplicateTags
+                    - s3:GetObjectVersionTagging
+                    Effect: 'Allow'
+                    Resource: !Sub arn:${AWS::Partition}:s3:::${DestinationBucket}/*
           S3Bucket:
             Type: AWS::S3::Bucket
             DeletionPolicy: Delete
@@ -281,7 +282,7 @@ Resources:
                     Filter:
                       Prefix: ''
                     Destination:
-                      Bucket: !Sub arn:aws:s3:::${DestinationBucket}
+                      Bucket: !Sub arn:${AWS::Partition}:s3:::${DestinationBucket}
                       StorageClass: STANDARD
                     DeleteMarkerReplication:
                       Status: Disabled
@@ -323,7 +324,7 @@ Resources:
                 - lambda.amazonaws.com
         Version: 2012-10-17
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - !Sub "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
       Path: /
       Policies:
         - PolicyName: !Sub "${CFDataName}-ManagementAccount-LambdaRole"
@@ -332,7 +333,7 @@ Resources:
             Statement:
               - Effect: "Allow"
                 Action: "sts:AssumeRole"
-                Resource: !Sub "arn:aws:iam::*:role/${ManagementRoleName}" # Need to assume a Read role in all Management Accounts
+                Resource: !Sub "arn:${AWS::Partition}:iam::*:role/${ManagementRoleName}" # Need to assume a Read role in all Management Accounts
     Metadata:
       cfn_nag:
         rules_to_suppress:
@@ -344,7 +345,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ResourcePrefix}${CFDataName}-Lambda'
       Description: "LambdaFunction to start ComputeOptimizer export jobs"
-      Runtime: python3.10
+      Runtime: python3.12
       Architectures: [x86_64]
       Environment:
         Variables:
@@ -360,14 +361,7 @@ Resources:
           import logging
           from datetime import date
           from functools import partial
-
-          # update boto3 version
-          import sys
-          from pip._internal import main
-          main(['install', '-I', '-q', 'boto3', '--target', '/tmp/', '--no-cache-dir', '--disable-pip-version-check'])
-          sys.path.insert(0,'/tmp/')
-
-          import boto3 #pylint: disable=wrong-import-position
+          import boto3
 
           BUCKET_PREFIX = os.environ["BUCKET_PREFIX"]
           INCLUDE_MEMBER_ACCOUNTS = os.environ.get("INCLUDE_MEMBER_ACCOUNTS", 'yes').lower() == 'yes'
@@ -391,8 +385,9 @@ Resources:
                   result_messages = []
                   error_messages = []
                   for region in REGIONS:
+                      partition = boto3.session.Session().get_partition_for_region(region_name=region)
                       credentials = boto3.client('sts', region_name=region).assume_role(
-                          RoleArn=f"arn:aws:iam::{payer_id}:role/{ROLE_NAME}",
+                          RoleArn=f"arn:{partition}:iam::{payer_id}:role/{ROLE_NAME}",
                           RoleSessionName="data_collection"
                       )["Credentials"]
                       co = boto3.client(
@@ -409,6 +404,7 @@ Resources:
                           'ebs_volume':   co.export_ebs_volume_recommendations,
                           'ecs_service':  co.export_ecs_service_recommendations,
                           'license':      co.export_license_recommendations,
+                          'rds_database': partial(co.export_rds_database_recommendations, recommendationPreferences={'cpuVendorArchitectures': ARCH}),
                       }
                       bucket = BUCKET_PREFIX + '.' + region
                       logger.info(f"INFO: bucket={bucket}")
@@ -419,7 +415,7 @@ Resources:
                                   s3DestinationConfig={
                                       'bucket': bucket,
                                       'keyPrefix': date.today().strftime(
-                                          f'compute_optimizer/compute_optimizer_{name}/payer_id={payer_id}/year=%Y/month=%m'
+                                          f'compute_optimizer/compute_optimizer_{name}/payer_id={payer_id}/year=%Y/month=%-m'
                                       ),
                                   }
                               )
@@ -458,7 +454,9 @@ Resources:
       StateMachineName: !Sub '${ResourcePrefix}${CFDataName}-StateMachine'
       StateMachineType: STANDARD
       RoleArn: !Ref StepFunctionExecutionRoleARN
-      DefinitionString: !Ref StepFunctionTemplate
+      DefinitionS3Location:
+        Bucket: !Ref CodeBucket
+        Key: !Ref StepFunctionTemplate
       DefinitionSubstitutions:
         AccountCollectorLambdaARN: !Ref AccountCollectorLambdaARN
         ModuleLambdaARN: !GetAtt LambdaFunction.Arn
@@ -490,7 +488,7 @@ Resources:
       Role: !GetAtt 'FinalizeLambdaExecutionRole.Arn'
       FunctionName: !Sub '${ResourcePrefix}${CFDataName}-Lambda-FinalizeSetup-DoNotRun'
       Description: "Lambda to Finalize Setup (call trigger lambda) or Start teardown (Cleanup buckets)"
-      Runtime: python3.10
+      Runtime: python3.12
       Architectures: [ arm64 ]
       Code:
         ZipFile: |
@@ -606,14 +604,14 @@ Resources:
                 Action:
                   - s3:DeleteObject
                   - s3:DeleteObjectVersion
-                Resource: !Sub 'arn:aws:s3:::${BucketPrefix}${AWS::AccountId}.*/*'
+                Resource: !Sub 'arn:${AWS::Partition}:s3:::${BucketPrefix}${AWS::AccountId}.*/*'
               - Effect: Allow
                 Action:
                   - s3:ListBucketVersions
                   - s3:DeleteBucket
-                Resource: !Sub 'arn:aws:s3:::${BucketPrefix}${AWS::AccountId}.*'
+                Resource: !Sub 'arn:${AWS::Partition}:s3:::${BucketPrefix}${AWS::AccountId}.*'
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - !Sub "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 
   FinalizeBucketsSetup:
     DependsOn:

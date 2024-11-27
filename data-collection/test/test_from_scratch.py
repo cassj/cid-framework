@@ -31,6 +31,7 @@ Python:
 
 """
 import logging
+import sys
 
 import pytest
 
@@ -40,6 +41,8 @@ from utils import athena_query
 logger = logging.getLogger(__name__)
 
 
+def test_deployment_works(athena):
+    pass
 
 def test_budgets_data(athena):
     data = athena_query(athena=athena, sql_query='SELECT * FROM "optimization_data"."budgets_data" LIMIT 10;')
@@ -55,6 +58,17 @@ def test_cost_anomaly_data(athena):
     data = athena_query(athena=athena, sql_query='SELECT * FROM "optimization_data"."cost_anomaly_data" LIMIT 10;')
     assert len(data) > 0, 'cost_anomaly_data is empty'
 
+def test_support_cases_data(athena):
+    data = athena_query(athena=athena, sql_query='SELECT * FROM "optimization_data"."support_cases_data" LIMIT 10;')
+    assert len(data) > 0, 'support_cases_data is empty'
+
+def test_support_cases_communications(athena):
+    data = athena_query(athena=athena, sql_query='SELECT * FROM "optimization_data"."support_cases_communications" LIMIT 10;')
+    assert len(data) > 0, 'support_cases_communications is empty'
+
+def test_support_cases_status(athena):
+    data = athena_query(athena=athena, sql_query='SELECT * FROM "optimization_data"."support_cases_status" LIMIT 10;')
+    assert len(data) > 0, 'test_support_cases_status is empty'
 
 def test_ecs_chargeback_data(athena):
     data = athena_query(athena=athena, sql_query='SELECT * FROM "optimization_data"."ecs_chargeback_data" LIMIT 10;')
@@ -81,9 +95,13 @@ def test_inventory_vpc_data(athena):
     data = athena_query(athena=athena, sql_query='SELECT * FROM "optimization_data"."inventory_vpc_data" LIMIT 10;')
     assert len(data) > 0, 'inventory_vpc_data is empty'
 
-def test_inventory_rds_snaphot_data(athena):
+def test_inventory_rds_snapshot_data(athena):
     data = athena_query(athena=athena, sql_query='SELECT * FROM "optimization_data"."inventory_rds_db_snapshots_data" LIMIT 10;')
-    assert len(data) > 0, 'inventory_vpc_data is empty'
+    assert len(data) > 0, 'inventory_rds_db_snapshots_data is empty'
+
+def test_inventory_lambda_functions_data(athena):
+    data = athena_query(athena=athena, sql_query='SELECT * FROM "optimization_data"."inventory_lambda_functions_data" LIMIT 10;')
+    assert len(data) > 0, 'inventory_lambda_functions_data is empty'
 
 def test_rds_usage_data(athena):
     data = athena_query(athena=athena, sql_query='SELECT * FROM "optimization_data"."rds_usage_data" LIMIT 10;')
@@ -137,6 +155,10 @@ def test_pricing_rds_data(athena):
     data = athena_query(athena=athena, sql_query='SELECT * FROM "optimization_data"."pricing_rds_data" LIMIT 10;')
     assert len(data) > 0, 'pricing_rds_data is empty'
 
+def test_pricing_lambda_data(athena):
+    data = athena_query(athena=athena, sql_query='SELECT * FROM "optimization_data"."pricing_lambda_data" LIMIT 10;')
+    assert len(data) > 0, 'pricing_lambda_data is empty'
+
 def test_pricing_regionnames_data(athena):
     data = athena_query(athena=athena, sql_query='SELECT * FROM "optimization_data"."pricing_regionnames_data" LIMIT 10;')
     assert len(data) > 0, 'pricing_regionnames_data is empty'
@@ -145,14 +167,48 @@ def test_compute_optimizer_export_triggered(compute_optimizer, start_time):
     jobs = compute_optimizer.describe_recommendation_export_jobs()['recommendationExportJobs']
     logger.debug(f'Jobs in: {jobs}')
     jobs_since_start = [job for job in jobs if job['creationTimestamp'].replace(tzinfo=None) > start_time.replace(tzinfo=None)]
-    assert len(jobs_since_start) == 6, f'started {len(jobs_since_start)} jobs. Expected 6. Not all jobs launched'
+    assert len(jobs_since_start) == 7, f'started {len(jobs_since_start)} jobs. Expected 7. Not all jobs launched'
     jobs_failed = [job for job in jobs_since_start if job.get('status') == 'failed']
     assert len(jobs_failed) == 0, f'Some jobs failed {jobs_failed}'
     # TODO: check how we can add better test, taking into account 15-30 mins delay of export in CO
 
-def test_cost_optimization_hub_data(athena):
-    data = athena_query(athena=athena, sql_query='SELECT * FROM "optimization_data"."cost_optimization_hub_data" LIMIT 10;')
-    assert len(data) > 0, 'cost_optimization_hub_data is empty'
+def test_health_events_data(athena):
+    data = athena_query(athena=athena, sql_query='SELECT * FROM "optimization_data"."health_events_detail_data" LIMIT 10;')
+    assert len(data) > 0, 'health_events_detail_data is empty'
+
+def test_license_manager_grants(athena):
+    data = athena_query(athena=athena, sql_query='SELECT * FROM "optimization_data"."license_manager_grants" LIMIT 10;')
+    assert len(data) > 0, 'license_manager_grants is empty'
+
+def test_license_manager_licenses(athena):
+    data = athena_query(athena=athena, sql_query='SELECT * FROM "optimization_data"."license_manager_licenses" LIMIT 10;')
+    assert len(data) > 0, 'license_manager_licenses is empty'
+
+def test_quicksight_users(athena):
+    data = athena_query(athena=athena, sql_query='SELECT * FROM "optimization_data"."quicksight_user_data" LIMIT 10;')
+    assert len(data) > 0, 'quicksight_user_data is empty'
+
+def test_quicksight_groups(athena):
+    data = athena_query(athena=athena, sql_query='SELECT * FROM "optimization_data"."quicksight_group_data" LIMIT 10;')
+    assert len(data) > 0, 'quicksight_group_data is empty'
+
+def test_quicksight_groupmembership(athena):
+    data = athena_query(athena=athena, sql_query='SELECT * FROM "optimization_data"."quicksight_groupmembership_data" LIMIT 10;')
+    assert len(data) > 0, 'quicksight_groupmembership_data is empty'
+
+def test_servicequotas_data(athena):
+    data = athena_query(athena=athena, sql_query='SELECT * FROM "optimization_data"."service_quotas_data" LIMIT 10;')
+    assert len(data) > 0, 'service_quotas_data is empty'
+
+def test_servicequotas_history(athena):
+    data = athena_query(athena=athena, sql_query='SELECT * FROM "optimization_data"."service_quotas_history" LIMIT 10;')
+    assert len(data) > 0, 'service_quotas_history is empty'
 
 if __name__ == '__main__':
+    pytest.params = {}
+    if '--no-teardown' in sys.argv:
+        sys.argv.remove('--no-teardown')
+        pytest.params['mode'] = 'no-teardown'
+
+    sys.argv = sys.argv[:1]
     pytest.main()

@@ -38,9 +38,12 @@ Parameters:
   AccountCollectorLambdaARN:
     Type: String
     Description: Arn of the Account Collector Lambda
+  CodeBucket:
+    Type: String
+    Description: Source code bucket
   StepFunctionTemplate:
     Type: String
-    Description: JSON representation of common StepFunction template
+    Description: S3 key to the JSON template for the StepFunction
   StepFunctionExecutionRoleARN:
     Type: String
     Description: Common role for Step Function execution
@@ -72,7 +75,7 @@ Resources:
                 - lambda.amazonaws.com
         Version: 2012-10-17
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - !Sub "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
       Path: /
       Policies:
         - PolicyName: "AssumeMultiAccountRole"
@@ -81,7 +84,7 @@ Resources:
             Statement:
               - Effect: "Allow"
                 Action: "sts:AssumeRole"
-                Resource: !Sub "arn:aws:iam::*:role/${MultiAccountRoleName}"
+                Resource: !Sub "arn:${AWS::Partition}:iam::*:role/${MultiAccountRoleName}"
         - PolicyName: "S3Access"
           PolicyDocument:
             Version: "2012-10-17"
@@ -102,7 +105,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${ResourcePrefix}${CFDataName}-Lambda'
       Description: !Sub "Lambda function to retrieve ${CFDataName}"
-      Runtime: python3.10
+      Runtime: python3.12
       Architectures: [x86_64]
       Code:
         ZipFile: |
@@ -115,9 +118,9 @@ Resources:
           from botocore.exceptions import ClientError
           from boto3.session import Session
 
-          bucket = os.environ["BUCKET_NAME"]
-          prefix = os.environ["PREFIX"]
-          role_name = os.environ['ROLENAME']
+          BUCKET = os.environ["BUCKET_NAME"]
+          PREFIX = os.environ["PREFIX"]
+          ROLE_NAME = os.environ['ROLENAME']
           REGIONS = [r.strip() for r in os.environ.get("REGIONS").split(',') if r]
           local_file = "/tmp/data.json"
 
@@ -176,22 +179,19 @@ Resources:
                                   print(region, account_id, type(exc), exc)
 
                   if os.path.getsize(local_file) == 0:
-                      print(f"No data in file for {prefix}")
+                      print(f"No data in file for {PREFIX}")
                   else:
-                      today = date.today()
-                      year = today.year
-                      month = today.month
-                      day = today.day
-                      key = f"{prefix}/{prefix}-data/payer_id={payer_id}/year={year}/month={month}/{account_id}-{year}-{month}-{day}.json"
+                      key = datetime.now().strftime(f"{PREFIX}/{PREFIX}-data/payer_id={payer_id}/year=%Y/month=%m/day=%d/{account_id}-%Y-%m-%d.json")
                       client = boto3.client("s3")
-                      client.upload_file(local_file, bucket, key)
+                      client.upload_file(local_file, BUCKET, key)
                       print(f"Data in s3 - {key}")
               except Exception as exc:
                   logging.warning(exc)
 
           def assume_session(account_id, region):
+              partition = boto3.session.Session().get_partition_for_region(region_name=region)
               cred = boto3.client('sts', region_name=region).assume_role(
-                  RoleArn=f"arn:aws:iam::{account_id}:role/{role_name}",
+                  RoleArn=f"arn:{partition}:iam::{account_id}:role/{ROLE_NAME}",
                   RoleSessionName="data_collection"
               )['Credentials']
               return boto3.Session(
@@ -243,7 +243,9 @@ Resources:
       StateMachineName: !Sub '${ResourcePrefix}${CFDataName}-StateMachine'
       StateMachineType: STANDARD
       RoleArn: !Ref StepFunctionExecutionRoleARN
-      DefinitionString: !Ref StepFunctionTemplate
+      DefinitionS3Location:
+        Bucket: !Ref CodeBucket
+        Key: !Ref StepFunctionTemplate
       DefinitionSubstitutions:
         AccountCollectorLambdaARN: !Ref AccountCollectorLambdaARN
         ModuleLambdaARN: !GetAtt LambdaFunction.Arn
